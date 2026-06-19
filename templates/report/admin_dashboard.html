@@ -26,7 +26,7 @@
       min-height: 100vh;
     }
 
-    /* ── Top bar ──────────────────────────────────────────── */
+    /* ── Top bar ── */
     .topbar {
       background: var(--navy);
       color: #fff;
@@ -37,135 +37,249 @@
       height: 60px;
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 200;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
-
-    .topbar-brand { font-size: 16px; font-weight: 600; letter-spacing: 0.3px; }
+    .topbar-brand { font-size: 16px; font-weight: 600; }
     .topbar-brand span { color: #93c5fd; }
-
-    .topbar-nav { display: flex; gap: 16px; align-items: center; }
+    .topbar-nav { display: flex; gap: 12px; align-items: center; }
     .topbar-nav a {
-      color: #cbd5e1;
-      text-decoration: none;
-      font-size: 13.5px;
-      padding: 6px 14px;
-      border-radius: 5px;
-      transition: background 0.15s, color 0.15s;
+      color: #cbd5e1; text-decoration: none; font-size: 13.5px;
+      padding: 6px 14px; border-radius: 5px; transition: background 0.15s, color 0.15s;
     }
     .topbar-nav a:hover { background: rgba(255,255,255,0.1); color: #fff; }
-    .topbar-nav .btn-primary {
-      background: var(--blue);
-      color: #fff;
-    }
+    .topbar-nav .btn-primary { background: var(--blue); color: #fff; }
     .topbar-nav .btn-primary:hover { background: #1d4ed8; }
 
-    /* ── Page layout ─────────────────────────────────────── */
-    .page { max-width: 1280px; margin: 0 auto; padding: 36px 32px 60px; }
-
-    .page-header { margin-bottom: 32px; }
-    .page-header h1 { font-size: 24px; font-weight: 700; color: var(--navy); }
+    /* ── Page ── */
+    .page { max-width: 1380px; margin: 0 auto; padding: 32px 32px 60px; }
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 { font-size: 22px; font-weight: 700; color: var(--navy); }
     .page-header p  { color: var(--muted); margin-top: 4px; font-size: 14px; }
 
-    /* ── Stat cards ──────────────────────────────────────── */
-    .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-bottom: 36px; }
-
-    .card {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 22px 24px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    /* ── Tab navigation ── */
+    .tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--border); margin-bottom: 32px; }
+    .tab-btn {
+      padding: 10px 22px;
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      border-radius: 6px 6px 0 0;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
     }
+    .tab-btn:hover { color: var(--navy); background: var(--grey); }
+    .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
 
-    .card-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); }
-    .card-value { font-size: 32px; font-weight: 700; margin: 6px 0 2px; color: var(--navy); }
-    .card-sub   { font-size: 13px; color: var(--muted); }
-
+    /* ── Stat cards ── */
+    .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 18px; margin-bottom: 32px; }
+    .card {
+      background: #fff; border: 1px solid var(--border); border-radius: 10px;
+      padding: 20px 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .card-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); }
+    .card-value { font-size: 30px; font-weight: 700; margin: 6px 0 2px; color: var(--navy); }
+    .card-sub   { font-size: 12.5px; color: var(--muted); }
     .card.green .card-value { color: var(--green); }
     .card.amber .card-value { color: var(--amber); }
-    .card.blue  .card-value { color: var(--blue);  }
+    .card.blue  .card-value { color: var(--blue); }
 
-    /* ── Progress bar ────────────────────────────────────── */
-    .progress-wrap { margin-bottom: 36px; background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .progress-wrap h3 { font-size: 14px; font-weight: 600; margin-bottom: 14px; color: var(--navy); }
-    .progress-bar-bg { background: #e2e8f0; border-radius: 999px; height: 12px; overflow: hidden; }
+    /* ── Progress ── */
+    .progress-wrap { margin-bottom: 28px; background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .progress-wrap h3 { font-size: 13.5px; font-weight: 600; margin-bottom: 12px; color: var(--navy); }
+    .progress-bar-bg { background: #e2e8f0; border-radius: 999px; height: 11px; overflow: hidden; }
     .progress-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #16a34a, #22c55e); transition: width 0.6s; }
-    .progress-label { font-size: 13px; color: var(--muted); margin-top: 8px; }
+    .progress-label { font-size: 12.5px; color: var(--muted); margin-top: 7px; }
 
-    /* ── Table panel ─────────────────────────────────────── */
+    /* ── Panel ── */
     .panel { background: #fff; border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
-    .panel-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-    .panel-header h2 { font-size: 16px; font-weight: 600; }
+    .panel-header { padding: 16px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .panel-header h2 { font-size: 15px; font-weight: 600; }
 
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    thead th { background: var(--grey); padding: 12px 16px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); }
-    tbody td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-    tbody tr:last-child td { border-bottom: none; }
-    tbody tr:hover { background: #f8fafc; }
+    /* ── Submissions table ── */
+    table.sub-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    table.sub-table thead th { background: var(--grey); padding: 11px 14px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); }
+    table.sub-table tbody td { padding: 13px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    table.sub-table tbody tr:last-child td { border-bottom: none; }
+    table.sub-table tbody tr:hover { background: #f8fafc; }
 
-    /* ── Badges ──────────────────────────────────────────── */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 600;
-      white-space: nowrap;
-    }
+    /* ── Badges ── */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
     .badge-green { background: #dcfce7; color: #15803d; }
     .badge-amber { background: #fef3c7; color: #b45309; }
     .badge-red   { background: #fee2e2; color: #b91c1c; }
 
-    /* ── Sig thumbnail ───────────────────────────────────── */
-    .sig-thumb {
-      width: 120px;
-      height: 40px;
-      object-fit: contain;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      background: #fdfdfd;
-    }
-    .sig-none { color: var(--muted); font-style: italic; font-size: 13px; }
+    .sig-thumb { width: 110px; height: 36px; object-fit: contain; border: 1px solid var(--border); border-radius: 4px; background: #fdfdfd; }
+    .sig-none  { color: var(--muted); font-style: italic; font-size: 12.5px; }
 
-    /* ── Action buttons ──────────────────────────────────── */
+    /* ── Buttons ── */
     .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 6px 14px;
-      border-radius: 5px;
-      font-size: 13px;
-      font-weight: 500;
-      text-decoration: none;
-      border: 1px solid transparent;
-      cursor: pointer;
-      transition: background 0.15s, opacity 0.15s;
-      white-space: nowrap;
+      display: inline-flex; align-items: center; gap: 5px; padding: 6px 13px;
+      border-radius: 5px; font-size: 12.5px; font-weight: 500; text-decoration: none;
+      border: 1px solid transparent; cursor: pointer; transition: background 0.15s, opacity 0.15s;
+      white-space: nowrap; background: transparent;
     }
-    .btn-outline { border-color: var(--border); background: #fff; color: var(--text); }
+    .btn-outline { border-color: var(--border); color: var(--text); }
     .btn-outline:hover { background: var(--grey); }
-    .btn-dark { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .btn-dark    { background: var(--navy); color: #fff; border-color: var(--navy); }
     .btn-dark:hover { background: #1e293b; }
-    .btn-danger { background: var(--red); color: #fff; border-color: var(--red); }
-    .btn-danger:hover { background: #991b1b; border-color: #991b1b; }
-    .btn-danger:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-green   { background: #16a34a; color: #fff; border-color: #16a34a; }
+    .btn-green:hover { background: #15803d; }
+    .btn-blue    { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .btn-blue:hover { background: #1d4ed8; }
+    .btn-amber   { background: #d97706; color: #fff; border-color: #d97706; }
+    .btn-amber:hover { background: #b45309; }
+    .btn-danger  { background: var(--red); color: #fff; border-color: var(--red); }
+    .btn-danger:hover { background: #991b1b; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* ── Empty state ─────────────────────────────────────── */
-    .empty { padding: 60px 24px; text-align: center; color: var(--muted); }
-    .empty-icon { font-size: 48px; margin-bottom: 12px; }
-    .empty h3   { font-size: 18px; font-weight: 600; color: var(--navy); margin-bottom: 6px; }
+    /* ── Empty ── */
+    .empty { padding: 56px 22px; text-align: center; color: var(--muted); }
+    .empty-icon { font-size: 44px; margin-bottom: 12px; }
+    .empty h3   { font-size: 17px; font-weight: 600; color: var(--navy); margin-bottom: 6px; }
 
-    /* ── Countdown timer (inline) ────────────────────────── */
-    .countdown { font-variant-numeric: tabular-nums; font-weight: 600; }
+    /* ══════════════════════════════════════════════
+       CORRECTIONS MANAGER
+    ══════════════════════════════════════════════ */
+
+    .cm-toolbar {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .cm-toolbar h2 { font-size: 16px; font-weight: 700; color: var(--navy); margin-right: auto; }
+
+    /* ── Section card ── */
+    .section-card {
+      background: #fff; border: 1px solid var(--border); border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 28px; overflow: hidden;
+    }
+    .section-header {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      padding: 14px 20px; background: var(--grey); border-bottom: 1px solid var(--border);
+    }
+    .section-title-text {
+      font-size: 14px; font-weight: 700; color: var(--navy);
+      text-transform: uppercase; letter-spacing: 0.4px; flex: 1; min-width: 0;
+    }
+    .section-title-input {
+      flex: 1; min-width: 0; font-size: 14px; font-weight: 700; color: var(--navy);
+      border: 1px solid #94a3b8; border-radius: 5px; padding: 5px 10px;
+      display: none; font-family: inherit;
+    }
+
+    /* ── Corrections table ── */
+    .corr-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .corr-table thead th {
+      background: #f8fafc; padding: 9px 12px; text-align: left;
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border);
+    }
+    .corr-table tbody td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .corr-table tbody tr:last-child td { border-bottom: none; }
+    .corr-table tbody tr:hover { background: #fafbfc; }
+
+    col.cn  { width: 4%; }
+    col.cm  { width: 12%; }
+    col.cc  { width: 28%; }
+    col.ca  { width: 28%; }
+    col.cd  { width: 7%; text-align: center; }
+    col.cac { width: 21%; }
+
+    td.td-no { text-align: center; color: var(--muted); font-size: 12px; }
+    td.td-done { text-align: center; }
+
+    /* ── Inline edit inputs ── */
+    .cell-view  { display: block; }
+    .cell-edit  { display: none; }
+    tr.editing .cell-view { display: none; }
+    tr.editing .cell-edit { display: block; }
+
+    .cell-input {
+      width: 100%; border: 1px solid #94a3b8; border-radius: 4px;
+      padding: 5px 8px; font-size: 13px; font-family: inherit; color: var(--text);
+      background: #fff; resize: vertical; min-height: 34px;
+    }
+    .cell-input:focus { outline: 2px solid #3b82f6; outline-offset: 1px; border-color: #3b82f6; }
+    .num-input { width: 52px; text-align: center; }
+
+    /* ── Done checkbox ── */
+    .done-check { width: 16px; height: 16px; cursor: pointer; accent-color: var(--green); }
+
+    /* ── Row action buttons ── */
+    .row-actions { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+    .btn-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 30px; height: 30px; border-radius: 5px; border: 1px solid var(--border);
+      background: #fff; color: var(--text); cursor: pointer; font-size: 14px;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .btn-icon:hover { background: var(--grey); border-color: #94a3b8; }
+    .btn-icon.save  { background: #16a34a; color: #fff; border-color: #16a34a; }
+    .btn-icon.save:hover { background: #15803d; }
+    .btn-icon.cancel { background: var(--grey); color: var(--muted); }
+    .btn-icon.cancel:hover { color: var(--navy); }
+    .btn-icon.danger { background: #fee2e2; color: var(--red); border-color: #fecaca; }
+    .btn-icon.danger:hover { background: var(--red); color: #fff; }
+
+    /* ── Add-row row ── */
+    tr.add-row-tr td {
+      background: #f0fdf4; border-top: 1px dashed #86efac; padding: 10px 12px;
+    }
+
+    /* ── Seed banner ── */
+    .seed-banner {
+      background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px;
+      padding: 16px 20px; margin-bottom: 24px;
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+    .seed-banner p { color: #92400e; font-size: 13.5px; flex: 1; }
+
+    /* ── Loading spinner ── */
+    .spinner {
+      display: inline-block; width: 18px; height: 18px;
+      border: 2px solid #e2e8f0; border-top-color: var(--blue);
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Toast ── */
+    #cm-toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      background: #1a1a1a; color: #fff; padding: 11px 20px;
+      border-radius: 6px; font-size: 13.5px; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s; max-width: 380px;
+    }
+    #cm-toast.show { opacity: 1; }
+    #cm-toast.err  { background: #7f1d1d; }
+
+    /* ── Modal ── */
+    .modal-bg {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 1000; align-items: center; justify-content: center;
+    }
+    .modal-bg.open { display: flex; }
+    .modal-box {
+      background: #fff; border-radius: 10px; padding: 28px 32px;
+      max-width: 480px; width: 94%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .modal-box h3 { font-size: 17px; font-weight: 700; margin-bottom: 16px; color: var(--navy); }
+    .modal-input {
+      width: 100%; border: 1px solid #94a3b8; border-radius: 6px; padding: 9px 14px;
+      font-size: 14px; font-family: inherit; margin-bottom: 18px;
+    }
+    .modal-input:focus { outline: 2px solid #3b82f6; border-color: #3b82f6; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
 
     @media (max-width: 768px) {
-      .page { padding: 20px 16px 40px; }
-      .topbar { padding: 0 16px; }
+      .page { padding: 16px 14px 40px; }
+      .topbar { padding: 0 14px; }
       .stats { grid-template-columns: 1fr 1fr; }
-      table { font-size: 13px; }
     }
   </style>
 </head>
@@ -187,106 +301,204 @@
     <p>Metascholar Consult Ltd &nbsp;·&nbsp; Catholic University of Ghana &nbsp;·&nbsp; ICT Director Confirmations</p>
   </div>
 
-  <!-- Stat cards -->
-  <div class="stats">
-    <div class="card blue">
-      <div class="card-label">Total Submissions</div>
-      <div class="card-value">{{ submissions|length }}</div>
-      <div class="card-sub">Director confirmations recorded</div>
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('submissions')">&#128196; Submissions</button>
+    <button class="tab-btn" onclick="switchTab('corrections')">&#9998; Corrections Manager</button>
+  </div>
+
+  <!-- ══════════════ TAB 1: SUBMISSIONS ══════════════ -->
+  <div id="tab-submissions" class="tab-panel active">
+
+    <!-- Stat cards -->
+    <div class="stats">
+      <div class="card blue">
+        <div class="card-label">Total Submissions</div>
+        <div class="card-value">{{ submissions|length }}</div>
+        <div class="card-sub">Director confirmations recorded</div>
+      </div>
+      <div class="card green">
+        <div class="card-label">Corrections Done</div>
+        <div class="card-value">{{ done_count }}</div>
+        <div class="card-sub">out of {{ total }} total items</div>
+      </div>
+      <div class="card {% if pct == 100 %}green{% elif pct >= 50 %}amber{% endif %}">
+        <div class="card-label">Completion Rate</div>
+        <div class="card-value">{{ pct }}%</div>
+        <div class="card-sub">Corrections marked as done</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Remaining</div>
+        <div class="card-value">{{ total|add:"-0" }}</div>
+        <div class="card-sub" id="remaining-sub">{{ done_count }} done · {{ total }} total</div>
+      </div>
     </div>
-    <div class="card green">
-      <div class="card-label">Corrections Done</div>
-      <div class="card-value">{{ done_count }}</div>
-      <div class="card-sub">out of {{ total }} total items</div>
+
+    <!-- Progress -->
+    <div class="progress-wrap">
+      <h3>Overall Correction Progress</h3>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" style="width: {{ pct }}%"></div>
+      </div>
+      <p class="progress-label">{{ done_count }} of {{ total }} corrections completed ({{ pct }}%)</p>
     </div>
-    <div class="card {% if pct == 100 %}green{% elif pct >= 50 %}amber{% else %}{% endif %}">
-      <div class="card-label">Completion Rate</div>
-      <div class="card-value">{{ pct }}%</div>
-      <div class="card-sub">Corrections marked as done</div>
-    </div>
-    <div class="card">
-      <div class="card-label">Remaining</div>
-      <div class="card-value">{{ total|add:done_count|add:"-50"|add:"25" }}</div>
-      <div class="card-sub">Corrections still pending</div>
+
+    <!-- Submissions table -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Submission Records</h2>
+      </div>
+
+      {% if submissions %}
+      <table class="sub-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Director Name</th>
+            <th>Signed Date</th>
+            <th>Signature</th>
+            <th>Submitted At</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sub in submissions %}
+          <tr id="row-{{ sub.id }}">
+            <td style="color:var(--muted);font-size:12px">{{ forloop.counter }}</td>
+            <td><strong>{{ sub.director_name|default:"—" }}</strong></td>
+            <td>{{ sub.signature_date|default:"—" }}</td>
+            <td>
+              {% if sub.signature_data %}
+                <img src="{{ sub.signature_data }}" alt="Signature" class="sig-thumb" />
+              {% else %}
+                <span class="sig-none">No signature</span>
+              {% endif %}
+            </td>
+            <td style="white-space:nowrap;color:var(--muted);font-size:12px">{{ sub.created_at_display }}</td>
+            <td>
+              <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">
+                <a href="/admin/print/{{ sub.id }}/" class="btn btn-dark" target="_blank">&#128196; View / Print</a>
+                <button class="btn btn-danger" onclick="deleteSubmission({{ sub.id }}, this)">&#128465; Delete</button>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">
+        <div class="empty-icon">&#128196;</div>
+        <h3>No submissions yet</h3>
+        <p>When the ICT Director fills and saves the form, it will appear here.</p>
+        <br>
+        <a href="/" class="btn btn-dark">Go to Report Form</a>
+      </div>
+      {% endif %}
     </div>
   </div>
 
-  <!-- Progress bar -->
-  <div class="progress-wrap">
-    <h3>Overall Correction Progress</h3>
-    <div class="progress-bar-bg">
-      <div class="progress-bar-fill" style="width: {{ pct }}%"></div>
-    </div>
-    <p class="progress-label">{{ done_count }} of {{ total }} corrections completed ({{ pct }}%)</p>
-  </div>
+  <!-- ══════════════ TAB 2: CORRECTIONS MANAGER ══════════════ -->
+  <div id="tab-corrections" class="tab-panel">
 
-  <!-- Submissions table -->
-  <div class="panel">
-    <div class="panel-header">
-      <h2>Submission Records</h2>
+    <!-- Seed banner (shown when not yet seeded) -->
+    <div class="seed-banner" id="seed-banner" style="{% if is_seeded %}display:none{% endif %}">
+      <p>&#9888; Corrections are not yet stored in Supabase. Click <strong>Seed Initial Data</strong> to load the default corrections, then you can edit, add, or delete items.</p>
+      <button class="btn btn-amber" id="btn-seed" onclick="seedCorrections()">&#128190; Seed Initial Data</button>
     </div>
 
-    {% if submissions %}
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Director Name</th>
-          <th>Signed Date</th>
-          <th>Signature</th>
-          <th>Submitted At</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for sub in submissions %}
-        <tr id="row-{{ sub.id }}">
-          <td style="color:var(--muted);font-size:13px">{{ forloop.counter }}</td>
-          <td><strong>{{ sub.director_name|default:"—" }}</strong></td>
-          <td>{{ sub.signature_date|default:"—" }}</td>
-          <td>
-            {% if sub.signature_data %}
-              <img src="{{ sub.signature_data }}" alt="Signature" class="sig-thumb" />
-            {% else %}
-              <span class="sig-none">No signature</span>
-            {% endif %}
-          </td>
-          <td style="white-space:nowrap;color:var(--muted);font-size:13px">{{ sub.created_at_display }}</td>
-          <td>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-              <a href="/admin/print/{{ sub.id }}/" class="btn btn-dark" target="_blank">
-                &#128196; View / Print
-              </a>
-              <button class="btn btn-danger" onclick="deleteSubmission({{ sub.id }}, this)">
-                &#128465; Delete
-              </button>
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-    <div class="empty">
-      <div class="empty-icon">&#128196;</div>
-      <h3>No submissions yet</h3>
-      <p>When the ICT Director fills and saves the form, it will appear here.</p>
-      <br>
-      <a href="/" class="btn btn-dark">Go to Report Form</a>
+    <div class="cm-toolbar">
+      <h2>Corrections Manager</h2>
+      <button class="btn btn-blue" onclick="openAddSectionModal()">&#43; Add New Section</button>
+      <button class="btn btn-outline" onclick="loadCorrections(true)">&#8635; Refresh</button>
     </div>
-    {% endif %}
+
+    <div id="cm-loading" style="text-align:center;padding:40px;display:none;">
+      <div class="spinner"></div>
+      <p style="margin-top:12px;color:var(--muted);font-size:13px">Loading corrections…</p>
+    </div>
+
+    <div id="cm-sections">
+      {% if not is_seeded %}
+      <div class="empty" style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:60px">
+        <div class="empty-icon">&#128196;</div>
+        <h3>No corrections in Supabase yet</h3>
+        <p>Seed the initial data above to get started, or add sections manually.</p>
+      </div>
+      {% endif %}
+    </div>
   </div>
 </main>
+
+<!-- ── Add Section Modal ── -->
+<div class="modal-bg" id="add-section-modal">
+  <div class="modal-box">
+    <h3>Add New Section</h3>
+    <input type="text" id="new-section-title" class="modal-input"
+      placeholder="e.g. 3.0 CORRECTIONS GIVEN ON MONDAY, 22ND JUNE, 2026" />
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('add-section-modal')">Cancel</button>
+      <button class="btn btn-blue" onclick="confirmAddSection()">Add Section</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Rename Section Modal ── -->
+<div class="modal-bg" id="rename-section-modal">
+  <div class="modal-box">
+    <h3>Rename Section</h3>
+    <input type="text" id="rename-section-title" class="modal-input" placeholder="New section title" />
+    <input type="hidden" id="rename-section-key" />
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('rename-section-modal')">Cancel</button>
+      <button class="btn btn-blue" onclick="confirmRenameSection()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="cm-toast"></div>
 
 <script>
 const CSRF = '{{ csrf_token }}';
 
+// ── Utilities ────────────────────────────────────────────────────────────────
+
+function toast(msg, isErr) {
+  const t = document.getElementById('cm-toast');
+  t.textContent = msg;
+  t.className = 'show' + (isErr ? ' err' : '');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => { t.className = ''; }, 3000);
+}
+
+function post(url, body) {
+  return fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+    body: JSON.stringify(body),
+  }).then(r => r.json());
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name === 'corrections') loadCorrections(false);
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Submissions tab: delete ───────────────────────────────────────────────────
+
 function deleteSubmission(id, btn) {
   if (!confirm('Delete this submission? This cannot be undone.')) return;
-
   btn.disabled = true;
   btn.textContent = 'Deleting…';
-
   fetch(`/admin/delete/${id}/`, {
     method: 'POST',
     headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json' },
@@ -295,23 +507,406 @@ function deleteSubmission(id, btn) {
     .then(d => {
       if (d.success) {
         const row = document.getElementById(`row-${id}`);
-        if (row) {
-          row.style.transition = 'opacity 0.3s';
-          row.style.opacity = '0';
-          setTimeout(() => row.remove(), 320);
-        }
+        if (row) { row.style.opacity = '0'; row.style.transition = 'opacity 0.3s'; setTimeout(() => row.remove(), 320); }
       } else {
         alert('Delete failed: ' + (d.error || 'Unknown error'));
         btn.disabled = false;
-        btn.textContent = '🗑 Delete';
+        btn.innerHTML = '&#128465; Delete';
+      }
+    })
+    .catch(() => { alert('Network error.'); btn.disabled = false; btn.innerHTML = '&#128465; Delete'; });
+}
+
+// ── Corrections Manager ───────────────────────────────────────────────────────
+
+let _sections = [];  // in-memory cache
+
+function loadCorrections(force) {
+  const container = document.getElementById('cm-sections');
+  const loading   = document.getElementById('cm-loading');
+  if (!force && _sections.length) { renderSections(); return; }
+
+  loading.style.display = 'block';
+  container.style.display = 'none';
+
+  fetch('/admin/api/corrections/')
+    .then(r => r.json())
+    .then(d => {
+      loading.style.display = 'none';
+      container.style.display = 'block';
+      if (d.seeded) {
+        document.getElementById('seed-banner').style.display = 'none';
+        _sections = d.sections;
+        renderSections();
+      } else {
+        _sections = [];
+        container.innerHTML = `
+          <div class="empty" style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:60px">
+            <div class="empty-icon">&#128196;</div>
+            <h3>No corrections in Supabase yet</h3>
+            <p>Seed the initial data above to get started, or add a new section.</p>
+          </div>`;
       }
     })
     .catch(() => {
-      alert('Network error — could not delete.');
-      btn.disabled = false;
-      btn.innerHTML = '&#128465; Delete';
+      loading.style.display = 'none';
+      container.style.display = 'block';
+      container.innerHTML = '<p style="color:red;padding:20px">Failed to load corrections.</p>';
     });
 }
+
+function renderSections() {
+  const container = document.getElementById('cm-sections');
+  if (!_sections.length) {
+    container.innerHTML = `
+      <div class="empty" style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:60px">
+        <div class="empty-icon">&#128196;</div>
+        <h3>No sections yet</h3>
+        <p>Click <strong>+ Add New Section</strong> to create the first section.</p>
+      </div>`;
+    return;
+  }
+  container.innerHTML = _sections.map((sec, si) => renderSection(sec, si)).join('');
+}
+
+function renderSection(sec, si) {
+  const itemRows = sec.items.map((item, ii) => renderItemRow(item, sec, ii)).join('');
+  return `
+  <div class="section-card" id="sec-${sec.section_key}">
+    <div class="section-header">
+      <span class="section-title-text" id="stt-${sec.section_key}">${esc(sec.section_title)}</span>
+      <input type="text" class="section-title-input" id="sti-${sec.section_key}"
+        value="${esc(sec.section_title)}" placeholder="Section title" />
+      <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+        <button class="btn btn-outline" style="font-size:12px" onclick="startRenameSection('${sec.section_key}')">&#9998; Rename</button>
+        <button class="btn btn-danger" style="font-size:12px" onclick="deleteSection('${sec.section_key}')">&#128465; Delete Section</button>
+      </div>
+    </div>
+    <table class="corr-table">
+      <colgroup>
+        <col class="cn"><col class="cm"><col class="cc"><col class="ca"><col class="cd"><col class="cac">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>No.</th><th>Module / Section</th>
+          <th>Correction Given by ICT Director</th>
+          <th>Required System Update / Action</th>
+          <th>Done</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-${sec.section_key}">
+        ${itemRows}
+        ${renderAddRow(sec)}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function renderItemRow(item, sec, ii) {
+  const doneCheck = item.is_done
+    ? `<input type="checkbox" class="done-check" checked onchange="toggleDone(${item.id}, this, '${item.correction_id}')">`
+    : `<input type="checkbox" class="done-check" onchange="toggleDone(${item.id}, this, '${item.correction_id}')">`;
+
+  return `
+  <tr id="row-item-${item.id}">
+    <td class="td-no">
+      <span class="cell-view">${esc(item.num)}</span>
+      <input type="number" class="cell-edit cell-input num-input" value="${esc(item.num)}" min="1" data-field="num">
+    </td>
+    <td>
+      <span class="cell-view">${esc(item.module)}</span>
+      <textarea class="cell-edit cell-input" rows="2" data-field="module">${esc(item.module)}</textarea>
+    </td>
+    <td>
+      <span class="cell-view">${esc(item.correction)}</span>
+      <textarea class="cell-edit cell-input" rows="3" data-field="correction">${esc(item.correction)}</textarea>
+    </td>
+    <td>
+      <span class="cell-view">${esc(item.action)}</span>
+      <textarea class="cell-edit cell-input" rows="3" data-field="action">${esc(item.action)}</textarea>
+    </td>
+    <td class="td-done">${doneCheck}</td>
+    <td>
+      <div class="row-actions">
+        <span class="cell-view" style="display:inline-flex;gap:5px">
+          <button class="btn-icon" title="Edit" onclick="startEditRow(${item.id})">&#9998;</button>
+          <button class="btn-icon danger" title="Delete" onclick="deleteItem(${item.id}, '${sec.section_key}')">&#128465;</button>
+        </span>
+        <span class="cell-edit" style="display:none;gap:5px">
+          <button class="btn-icon save" title="Save" onclick="saveRow(${item.id}, '${sec.section_key}', '${item.correction_id}')">&#10003;</button>
+          <button class="btn-icon cancel" title="Cancel" onclick="cancelEditRow(${item.id})">&#10005;</button>
+        </span>
+      </div>
+    </td>
+  </tr>`;
+}
+
+function renderAddRow(sec) {
+  return `
+  <tr class="add-row-tr" id="add-row-${sec.section_key}">
+    <td colspan="6">
+      <button class="btn btn-green" style="font-size:12px" onclick="showNewItemForm('${sec.section_key}')">
+        &#43; Add Row to this Section
+      </button>
+    </td>
+  </tr>
+  <tr id="new-item-form-${sec.section_key}" style="display:none;background:#f0fdf4">
+    <td><input type="number" class="cell-input num-input" id="ni-num-${sec.section_key}" value="1" min="1" style="width:52px"></td>
+    <td><textarea class="cell-input" rows="2" id="ni-module-${sec.section_key}" placeholder="Module / Section"></textarea></td>
+    <td><textarea class="cell-input" rows="3" id="ni-correction-${sec.section_key}" placeholder="Correction given by ICT Director"></textarea></td>
+    <td><textarea class="cell-input" rows="3" id="ni-action-${sec.section_key}" placeholder="Required system update / action"></textarea></td>
+    <td></td>
+    <td>
+      <div style="display:flex;gap:6px;flex-direction:column">
+        <button class="btn btn-green" style="font-size:12px;width:100%" onclick="submitNewItem('${sec.section_key}', '${esc(sec.section_title)}', ${sec.section_order})">&#10003; Save Row</button>
+        <button class="btn btn-outline" style="font-size:12px;width:100%" onclick="hideNewItemForm('${sec.section_key}')">Cancel</button>
+      </div>
+    </td>
+  </tr>`;
+}
+
+// ── Seed ─────────────────────────────────────────────────────────────────────
+
+function seedCorrections() {
+  const btn = document.getElementById('btn-seed');
+  btn.disabled = true;
+  btn.textContent = 'Seeding…';
+  post('/admin/api/corrections/seed/', {})
+    .then(d => {
+      if (d.success) {
+        toast(d.message || 'Seeded successfully.');
+        document.getElementById('seed-banner').style.display = 'none';
+        loadCorrections(true);
+      } else {
+        toast('Seed failed: ' + (d.error || '?'), true);
+        btn.disabled = false;
+        btn.textContent = '💾 Seed Initial Data';
+      }
+    })
+    .catch(() => { toast('Network error.', true); btn.disabled = false; btn.innerHTML = '&#128190; Seed Initial Data'; });
+}
+
+// ── Edit row ─────────────────────────────────────────────────────────────────
+
+function startEditRow(itemId) {
+  const row = document.getElementById(`row-item-${itemId}`);
+  row.classList.add('editing');
+  // swap action button visibility
+  row.querySelectorAll('.row-actions .cell-view').forEach(el => el.style.display = 'none');
+  row.querySelectorAll('.row-actions .cell-edit').forEach(el => el.style.display = 'inline-flex');
+}
+
+function cancelEditRow(itemId) {
+  // Full re-render from cache is easiest
+  loadCorrections(true);
+}
+
+function saveRow(itemId, sectionKey, correctionId) {
+  const row = document.getElementById(`row-item-${itemId}`);
+  const inputs = {};
+  row.querySelectorAll('.cell-edit.cell-input, .cell-edit textarea, .cell-edit input').forEach(el => {
+    if (el.dataset.field) inputs[el.dataset.field] = el.tagName === 'TEXTAREA' ? el.value : el.value;
+  });
+
+  post(`/admin/api/corrections/${itemId}/update/`, inputs)
+    .then(d => {
+      if (d.success) {
+        toast('Row saved.');
+        // Update local cache
+        for (const sec of _sections) {
+          const item = sec.items.find(i => i.id === itemId);
+          if (item) {
+            if (inputs.num)        item.num        = parseInt(inputs.num);
+            if (inputs.module      !== undefined) item.module     = inputs.module;
+            if (inputs.correction  !== undefined) item.correction = inputs.correction;
+            if (inputs.action      !== undefined) item.action     = inputs.action;
+          }
+        }
+        renderSections();
+      } else {
+        toast('Save failed: ' + (d.error || '?'), true);
+      }
+    })
+    .catch(() => toast('Network error.', true));
+}
+
+// ── Toggle done ───────────────────────────────────────────────────────────────
+
+function toggleDone(itemId, checkbox, correctionId) {
+  const val = checkbox.checked;
+  Promise.all([
+    post(`/admin/api/corrections/${itemId}/update/`, { is_done: val }),
+    post('/api/update-correction/', { correction_id: correctionId, is_done: val }),
+  ]).then(([d]) => {
+    if (d.success) {
+      toast(val ? 'Marked as done.' : 'Unmarked.');
+      for (const sec of _sections) {
+        const item = sec.items.find(i => i.id === itemId);
+        if (item) item.is_done = val;
+      }
+    } else {
+      toast('Failed: ' + (d.error || '?'), true);
+      checkbox.checked = !val;
+    }
+  }).catch(() => { toast('Network error.', true); checkbox.checked = !val; });
+}
+
+// ── Delete item ───────────────────────────────────────────────────────────────
+
+function deleteItem(itemId, sectionKey) {
+  if (!confirm('Delete this correction row? This cannot be undone.')) return;
+  post(`/admin/api/corrections/${itemId}/delete/`, {})
+    .then(d => {
+      if (d.success) {
+        toast('Row deleted.');
+        for (const sec of _sections) {
+          sec.items = sec.items.filter(i => i.id !== itemId);
+        }
+        renderSections();
+      } else {
+        toast('Delete failed: ' + (d.error || '?'), true);
+      }
+    })
+    .catch(() => toast('Network error.', true));
+}
+
+// ── New item form ─────────────────────────────────────────────────────────────
+
+function showNewItemForm(sectionKey) {
+  document.getElementById(`new-item-form-${sectionKey}`).style.display = '';
+  document.getElementById(`add-row-${sectionKey}`).style.display = 'none';
+  // Auto-fill num with next number
+  const sec = _sections.find(s => s.section_key === sectionKey);
+  if (sec) {
+    const maxNum = sec.items.reduce((m, i) => Math.max(m, i.num || 0), 0);
+    const numInput = document.getElementById(`ni-num-${sectionKey}`);
+    if (numInput) numInput.value = maxNum + 1;
+  }
+}
+
+function hideNewItemForm(sectionKey) {
+  document.getElementById(`new-item-form-${sectionKey}`).style.display = 'none';
+  document.getElementById(`add-row-${sectionKey}`).style.display = '';
+}
+
+function submitNewItem(sectionKey, sectionTitle, sectionOrder) {
+  const num        = document.getElementById(`ni-num-${sectionKey}`).value.trim();
+  const module     = document.getElementById(`ni-module-${sectionKey}`).value.trim();
+  const correction = document.getElementById(`ni-correction-${sectionKey}`).value.trim();
+  const action     = document.getElementById(`ni-action-${sectionKey}`).value.trim();
+
+  if (!module && !correction && !action) {
+    toast('Please fill in at least one field.', true); return;
+  }
+
+  post('/admin/api/corrections/add/', {
+    section_key: sectionKey,
+    section_title: sectionTitle,
+    section_order: sectionOrder,
+    num: num || 1,
+    module, correction, action,
+  })
+    .then(d => {
+      if (d.success && d.item) {
+        toast('Row added.');
+        const sec = _sections.find(s => s.section_key === sectionKey);
+        if (sec) sec.items.push({ ...d.item, is_done: false });
+        renderSections();
+      } else {
+        toast('Add failed: ' + (d.error || '?'), true);
+      }
+    })
+    .catch(() => toast('Network error.', true));
+}
+
+// ── Add section ───────────────────────────────────────────────────────────────
+
+function openAddSectionModal() {
+  document.getElementById('new-section-title').value = '';
+  openModal('add-section-modal');
+}
+
+function confirmAddSection() {
+  const title = document.getElementById('new-section-title').value.trim();
+  if (!title) { toast('Please enter a section title.', true); return; }
+
+  post('/admin/api/sections/add/', { title })
+    .then(d => {
+      if (d.success && d.section) {
+        toast('Section added.');
+        closeModal('add-section-modal');
+        _sections.push(d.section);
+        renderSections();
+      } else {
+        toast('Failed: ' + (d.error || '?'), true);
+      }
+    })
+    .catch(() => toast('Network error.', true));
+}
+
+// ── Rename section ────────────────────────────────────────────────────────────
+
+function startRenameSection(sectionKey) {
+  const sec = _sections.find(s => s.section_key === sectionKey);
+  if (!sec) return;
+  document.getElementById('rename-section-key').value   = sectionKey;
+  document.getElementById('rename-section-title').value = sec.section_title;
+  openModal('rename-section-modal');
+}
+
+function confirmRenameSection() {
+  const key   = document.getElementById('rename-section-key').value;
+  const title = document.getElementById('rename-section-title').value.trim();
+  if (!title) { toast('Title cannot be empty.', true); return; }
+
+  post(`/admin/api/sections/${key}/update-title/`, { title })
+    .then(d => {
+      if (d.success) {
+        toast('Section renamed.');
+        closeModal('rename-section-modal');
+        const sec = _sections.find(s => s.section_key === key);
+        if (sec) sec.section_title = title;
+        renderSections();
+      } else {
+        toast('Failed: ' + (d.error || '?'), true);
+      }
+    })
+    .catch(() => toast('Network error.', true));
+}
+
+// ── Delete section ────────────────────────────────────────────────────────────
+
+function deleteSection(sectionKey) {
+  const sec = _sections.find(s => s.section_key === sectionKey);
+  const name = sec ? sec.section_title : sectionKey;
+  if (!confirm(`Delete the entire section "${name}" and all its rows? This cannot be undone.`)) return;
+
+  post(`/admin/api/sections/${sectionKey}/delete/`, {})
+    .then(d => {
+      if (d.success) {
+        toast('Section deleted.');
+        _sections = _sections.filter(s => s.section_key !== sectionKey);
+        renderSections();
+      } else {
+        toast('Delete failed: ' + (d.error || '?'), true);
+      }
+    })
+    .catch(() => toast('Network error.', true));
+}
+
+// ── Close modal on backdrop click ────────────────────────────────────────────
+
+document.querySelectorAll('.modal-bg').forEach(bg => {
+  bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('open'); });
+});
+
+// Close modal on Enter key in inputs
+document.getElementById('new-section-title').addEventListener('keydown', e => {
+  if (e.key === 'Enter') confirmAddSection();
+});
+document.getElementById('rename-section-title').addEventListener('keydown', e => {
+  if (e.key === 'Enter') confirmRenameSection();
+});
 </script>
 </body>
 </html>
