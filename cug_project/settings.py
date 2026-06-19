@@ -18,10 +18,10 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-cug-archival-system-change
 
 DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1')
 
-_allowed = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost')
+_allowed = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost,udtsform.sslip.io')
 ALLOWED_HOSTS = [h.strip() for h in _allowed.split(',') if h.strip()]
 
-_origins = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://127.0.0.1:8000,http://localhost:8000')
+_origins = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://127.0.0.1:8000,http://localhost:8000,http://udtsform.sslip.io')
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in _origins.split(',') if o.strip()]
 
 INSTALLED_APPS = [

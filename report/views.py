@@ -41,12 +41,13 @@ def _send_notification(director_name, signature_date, submission_id):
     if not NOTIFY:
         return
     subject = 'CUG Archival System — Corrections Report Submitted'
+    host = os.getenv('SITE_URL', 'http://udtsform.sslip.io')
     text = (
         f"The ICT Director Confirmation Form has been submitted.\n\n"
         f"Director: {director_name or '(not entered)'}\n"
         f"Date:     {signature_date or '(not entered)'}\n\n"
-        f"View the admin dashboard: http://127.0.0.1:8000/admin/\n"
-        f"Print / export report:    http://127.0.0.1:8000/admin/print/{submission_id}/\n"
+        f"View the admin dashboard: {host}/admin/\n"
+        f"Print / export report:    {host}/admin/print/{submission_id}/\n"
     )
     html = f"""
     <html><body style="font-family:Arial,sans-serif;color:#111;max-width:600px;margin:auto">
@@ -63,11 +64,11 @@ def _send_notification(director_name, signature_date, submission_id):
             <td style="padding:6px 0">{signature_date or '<em>not entered</em>'}</td></tr>
       </table>
       <p>
-        <a href="http://127.0.0.1:8000/admin/"
+        <a href="{host}/admin/"
            style="background:#1a1a1a;color:#fff;padding:10px 20px;text-decoration:none;border-radius:4px;display:inline-block;margin-right:10px">
            View Dashboard
         </a>
-        <a href="http://127.0.0.1:8000/admin/print/{submission_id}/"
+        <a href="{host}/admin/print/{submission_id}/"
            style="background:#555;color:#fff;padding:10px 20px;text-decoration:none;border-radius:4px;display:inline-block">
            Print / Export Report
         </a>
