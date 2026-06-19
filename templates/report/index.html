@@ -367,9 +367,9 @@
 <!-- ═══════════════ PAGE 1 ═══════════════ -->
 <section class="page">
   <div class="header">
-    <h1>
-      <span style="display:block;text-align:center;">METASCHOLAR CONSULT LTD</span>
-      University Digital Transformation Suite (UDTS)<br>
+    <h1 style="text-align:center;">
+      METASCHOLAR CONSULT LTD<br>
+      <span style="text-transform:none;">University Digital Transformation Suite (UDTS)</span><br>
       FOR THE ICT DIRECTOR, CATHOLIC UNIVERSITY OF GHANA
     </h1>
   </div>
@@ -802,10 +802,20 @@ function saveConfirmation() {
       } else if (d.error === 'locked') {
         showToast('Form is locked — edit window expired.', true);
         lockForm();
+      } else if (d.error === 'name_exists') {
+        showToast('A confirmation under this name has already been permanently recorded. Each director may only submit once.', true);
+        saveBtn.disabled = false;
+        saveBtn.textContent = HAS_SUBMISSION ? 'Update Confirmation' : 'Save Confirmation';
+      } else if (d.error === 'name_required') {
+        showToast('Please enter the name of the ICT Director.', true);
+        const nameEl = document.getElementById('director-name');
+        if (nameEl) { nameEl.classList.add('field-error'); nameEl.focus(); }
+        saveBtn.disabled = false;
+        saveBtn.textContent = HAS_SUBMISSION ? 'Update Confirmation' : 'Save Confirmation';
       } else {
         showToast('Error: ' + (d.error || '?'), true);
         saveBtn.disabled = false;
-        saveBtn.textContent = 'Save Confirmation';
+        saveBtn.textContent = HAS_SUBMISSION ? 'Update Confirmation' : 'Save Confirmation';
       }
     })
     .catch(() => {

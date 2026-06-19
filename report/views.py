@@ -166,21 +166,29 @@ def save_confirmation(request):
         comments = data.get('other_comments', '').strip() or None
         svc      = get_service_client()
 
-        # Check existing submission
-        existing = (
+        if not name:
+            return JsonResponse({'error': 'name_required', 'message': 'Director name is required.'}, status=400)
+
+        # Find any existing submission matching this director name (case-insensitive)
+        name_match = (
             svc.table('cug_director_confirmation')
-            .select('id, created_at')
+            .select('id, created_at, director_name')
+            .ilike('director_name', name)
             .order('created_at', desc=True)
             .limit(1)
             .execute()
         )
-        row = existing.data[0] if existing.data else None
+        row = name_match.data[0] if name_match.data else None
 
         if row:
             is_editable, _ = _lock_status(row.get('created_at'))
             if not is_editable:
-                return JsonResponse({'error': 'locked', 'message': 'Edit window has expired.'}, status=403)
-            # Update in place — try with signature_data, fall back without it
+                # Name already has a permanently locked submission — block re-submission
+                return JsonResponse({
+                    'error': 'name_exists',
+                    'message': f'A confirmation from "{row["director_name"]}" has already been permanently recorded.',
+                }, status=409)
+            # Same name within edit window → allow update
             try:
                 svc.table('cug_director_confirmation').update(
                     {'director_name': name, 'signature_date': date, 'signature_data': sig, 'other_comments': comments}
@@ -191,7 +199,7 @@ def save_confirmation(request):
                 ).eq('id', row['id']).execute()
             return JsonResponse({'success': True, 'submission_id': row['id'], 'updated': True})
         else:
-            # First save — try with all fields, fall back to minimal
+            # New name — insert first submission
             try:
                 ins = svc.table('cug_director_confirmation').insert(
                     {'director_name': name, 'signature_date': date, 'signature_data': sig, 'other_comments': comments}
