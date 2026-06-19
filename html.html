@@ -115,6 +115,36 @@
       font-size: 16px;
     }
 
+    .comments-section {
+      margin-top: 22px;
+      font-size: 17px;
+    }
+
+    .comments-section h2 {
+      font-size: 17px;
+      margin: 0 0 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .comments-textarea {
+      width: 100%;
+      min-height: 90px;
+      border: 1px solid #999;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 16px;
+      color: #111;
+      background: #fff;
+      resize: vertical;
+    }
+
+    .comments-textarea:focus {
+      outline: 2px solid #777;
+      outline-offset: 1px;
+    }
+
     .signature-section {
       margin-top: 22px;
       font-size: 17px;
@@ -161,6 +191,71 @@
       outline-offset: 1px;
     }
 
+    .name-input {
+      flex: 1;
+      height: 34px;
+      border: 1px solid #999;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 16px;
+      background: #fff;
+      color: #111;
+    }
+
+    .name-input:focus {
+      outline: 2px solid #777;
+      outline-offset: 1px;
+    }
+
+    .btn-submit {
+      margin-top: 28px;
+      padding: 11px 42px;
+      font-size: 16px;
+      font-family: "Times New Roman", Times, serif;
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: block;
+    }
+
+    .btn-submit:hover { background: #333; }
+
+    /* ── Thank-you overlay ── */
+    .ty-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 9000;
+      align-items: center;
+      justify-content: center;
+    }
+    .ty-overlay.open { display: flex; }
+    .ty-box {
+      background: #fff;
+      border-radius: 12px;
+      padding: 44px 48px;
+      max-width: 480px;
+      width: 92%;
+      text-align: center;
+      font-family: system-ui, sans-serif;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .ty-check {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: #dcfce7;
+      color: #15803d;
+      font-size: 32px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 18px;
+    }
+    .ty-box h2 { font-size: 20px; font-weight: 700; color: #0f172a; margin: 0 0 10px; }
+    .ty-box p  { font-size: 15px; color: #475569; line-height: 1.6; margin: 0; }
+
     @media print {
       body {
         background: #fff;
@@ -183,9 +278,9 @@
   <!-- PAGE 1 -->
   <section class="page">
     <div class="header">
-      <h1>
+      <h1 style="text-align: center;">
         METASCHOLAR CONSULT LTD<br />
-        ARCHIVAL SYSTEM CORRECTIONS REPORT<br />
+        <span style="text-transform:none;">University Digital Transformation Suite (UDTS)</span><br />
         FOR THE ICT DIRECTOR, CATHOLIC UNIVERSITY OF GHANA
       </h1>
     </div>
@@ -423,6 +518,11 @@
       </tbody>
     </table>
 
+    <div class="comments-section">
+      <h2>Other Comments <span style="font-weight:normal;font-size:14px;text-transform:none;">(Optional)</span></h2>
+      <textarea class="comments-textarea" placeholder="Add any additional comments here…"></textarea>
+    </div>
+
     <div class="signature-section">
       <h2>3.0 ICT DIRECTOR CONFIRMATION AND SIGNATURE</h2>
       <p>
@@ -431,7 +531,7 @@
 
       <div class="line-row">
         <span>NAME OF ICT DIRECTOR:</span>
-        <div class="line"></div>
+        <input type="text" id="director-name" class="name-input" placeholder="Enter full name" />
       </div>
       <div class="line-row">
         <span>SIGNATURE:</span>
@@ -439,16 +539,33 @@
       </div>
       <div class="line-row">
         <span>DATE:</span>
-        <input type="date" class="date-input" />
+        <input type="date" id="director-date" class="date-input" />
       </div>
+
+      <button type="button" class="btn-submit" id="btn-submit" onclick="submitForm()">
+        Submit Confirmation
+      </button>
     </div>
 
     <div class="footer">Page 3 of 3</div>
   </section>
 
+  <!-- Thank-you overlay -->
+  <div class="ty-overlay" id="ty-overlay">
+    <div class="ty-box">
+      <div class="ty-check">&#10003;</div>
+      <h2>Thank You!</h2>
+      <p>Your details have been recorded.<br>You will be redirected shortly…</p>
+    </div>
+  </div>
 
   <script>
-    // Keeps checkboxes interactive in the browser and print-friendly.
+    // One-time submission guard
+    if (localStorage.getItem('udts_submitted')) {
+      window.location.replace('thanks.html');
+    }
+
+    // Checkboxes stay checked on print
     document.querySelectorAll('input[type="checkbox"]').forEach(function (box) {
       box.addEventListener('change', function () {
         if (box.checked) {
@@ -458,6 +575,31 @@
         }
       });
     });
+
+    function submitForm() {
+      var name = document.getElementById('director-name').value.trim();
+      var date = document.getElementById('director-date').value;
+
+      if (!name) {
+        alert('Please enter the name of the ICT Director before submitting.');
+        document.getElementById('director-name').focus();
+        return;
+      }
+      if (!date) {
+        alert('Please select a date before submitting.');
+        document.getElementById('director-date').focus();
+        return;
+      }
+
+      document.getElementById('btn-submit').disabled = true;
+      document.getElementById('ty-overlay').classList.add('open');
+
+      localStorage.setItem('udts_submitted', '1');
+
+      setTimeout(function () {
+        window.location.href = 'thanks.html';
+      }, 2200);
+    }
   </script>
 
 </body>

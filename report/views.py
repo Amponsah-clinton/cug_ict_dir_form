@@ -100,13 +100,13 @@ def report_view(request):
     try:
         conf_result = (
             client.table('cug_director_confirmation')
-            .select('id, director_name, signature_date, signature_data, created_at')
+            .select('id, director_name, signature_date, signature_data, other_comments, created_at')
             .order('created_at', desc=True)
             .limit(1)
             .execute()
         )
     except Exception:
-        # signature_data column may not exist yet — run supabase_migrations.sql
+        # columns may not exist yet — run supabase_migrations.sql
         conf_result = (
             client.table('cug_director_confirmation')
             .select('id, director_name, signature_date, created_at')
@@ -115,8 +115,9 @@ def report_view(request):
             .execute()
         )
     confirmation = conf_result.data[0] if conf_result.data else None
-    if confirmation and 'signature_data' not in confirmation:
-        confirmation['signature_data'] = None
+    if confirmation:
+        confirmation.setdefault('signature_data', None)
+        confirmation.setdefault('other_comments', None)
 
     is_editable = True
     seconds_remaining = EDIT_WINDOW
@@ -158,11 +159,12 @@ def update_correction(request):
 @require_http_methods(['POST'])
 def save_confirmation(request):
     try:
-        data       = json.loads(request.body)
-        name       = data.get('director_name', '').strip()
-        date       = data.get('signature_date', '').strip() or None
-        sig        = data.get('signature_data', '').strip() or None
-        svc        = get_service_client()
+        data     = json.loads(request.body)
+        name     = data.get('director_name', '').strip()
+        date     = data.get('signature_date', '').strip() or None
+        sig      = data.get('signature_data', '').strip() or None
+        comments = data.get('other_comments', '').strip() or None
+        svc      = get_service_client()
 
         # Check existing submission
         existing = (
@@ -181,7 +183,7 @@ def save_confirmation(request):
             # Update in place — try with signature_data, fall back without it
             try:
                 svc.table('cug_director_confirmation').update(
-                    {'director_name': name, 'signature_date': date, 'signature_data': sig}
+                    {'director_name': name, 'signature_date': date, 'signature_data': sig, 'other_comments': comments}
                 ).eq('id', row['id']).execute()
             except Exception:
                 svc.table('cug_director_confirmation').update(
@@ -189,10 +191,10 @@ def save_confirmation(request):
                 ).eq('id', row['id']).execute()
             return JsonResponse({'success': True, 'submission_id': row['id'], 'updated': True})
         else:
-            # First save — try with signature_data, fall back without it
+            # First save — try with all fields, fall back to minimal
             try:
                 ins = svc.table('cug_director_confirmation').insert(
-                    {'director_name': name, 'signature_date': date, 'signature_data': sig}
+                    {'director_name': name, 'signature_date': date, 'signature_data': sig, 'other_comments': comments}
                 ).execute()
             except Exception:
                 ins = svc.table('cug_director_confirmation').insert(
@@ -214,7 +216,7 @@ def admin_dashboard(request):
     try:
         subs_raw = (
             client.table('cug_director_confirmation')
-            .select('id, director_name, signature_date, signature_data, created_at')
+            .select('id, director_name, signature_date, signature_data, other_comments, created_at')
             .order('created_at', desc=True)
             .execute()
         )
@@ -227,6 +229,7 @@ def admin_dashboard(request):
         )
     for row in (subs_raw.data or []):
         row.setdefault('signature_data', None)
+        row.setdefault('other_comments', None)
 
     corrections_raw = (
         client.table('cug_corrections')
@@ -286,7 +289,7 @@ def print_report(request, submission_id):
     try:
         subs = (
             client.table('cug_director_confirmation')
-            .select('id, director_name, signature_date, signature_data, created_at')
+            .select('id, director_name, signature_date, signature_data, other_comments, created_at')
             .eq('id', submission_id)
             .execute()
         )
@@ -300,6 +303,8 @@ def print_report(request, submission_id):
     if not subs.data:
         raise Http404('Submission not found')
     confirmation = subs.data[0]
+    confirmation.setdefault('signature_data', None)
+    confirmation.setdefault('other_comments', None)
 
     corrections_raw = (
         client.table('cug_corrections')

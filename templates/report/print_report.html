@@ -218,8 +218,8 @@
 <section class="page">
   <div class="header">
     <h1>
-      METASCHOLAR CONSULT LTD<br>
-      ARCHIVAL SYSTEM CORRECTIONS REPORT<br>
+      <span style="display:block;text-align:center;">METASCHOLAR CONSULT LTD</span>
+      University Digital Transformation Suite (UDTS)<br>
       FOR THE ICT DIRECTOR, CATHOLIC UNIVERSITY OF GHANA
     </h1>
   </div>
@@ -339,6 +339,14 @@
       {% endif %}{% endfor %}
     </tbody>
   </table>
+
+  <!-- ── Other Comments ── -->
+  {% if confirmation.other_comments %}
+  <div style="margin-top:22px;">
+    <h2 style="font-size:15px;font-weight:bold;text-transform:uppercase;margin:0 0 8px;">Other Comments</h2>
+    <p style="font-size:14.5px;border:1px solid #ccc;border-radius:4px;padding:8px 10px;background:#fafafa;">{{ confirmation.other_comments }}</p>
+  </div>
+  {% endif %}
 
   <!-- ── Confirmation with real rendered signature ── -->
   <div class="sig-section">

@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS cug_director_confirmation (
     director_name   TEXT,
     signature_date  DATE,
     signature_data  TEXT,          -- base64 data-URL of the drawn signature
+    other_comments  TEXT,
     created_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
     updated_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
@@ -40,6 +41,10 @@ ALTER TABLE cug_director_confirmation
 -- Add updated_at if table already existed without it
 ALTER TABLE cug_director_confirmation
     ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+
+-- Add other_comments if table already existed without it
+ALTER TABLE cug_director_confirmation
+    ADD COLUMN IF NOT EXISTS other_comments TEXT;
 
 CREATE OR REPLACE FUNCTION _cug_confirmation_set_updated()
 RETURNS TRIGGER LANGUAGE plpgsql AS $$

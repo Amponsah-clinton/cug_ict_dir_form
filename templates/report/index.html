@@ -322,10 +322,28 @@
     }
     .toast.show { opacity: 1; }
 
+    /* ── Other comments textarea ─────────────────────────── */
+    .comments-section { margin-top: 30px; }
+    .comments-section h2 { font-size: 17px; margin: 0 0 12px; font-weight: bold; text-transform: uppercase; }
+    .textarea-input {
+      width: 100%;
+      min-height: 100px;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+      padding: 8px 12px;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 15.5px;
+      color: #111;
+      background: #fff;
+      resize: vertical;
+    }
+    .textarea-input:focus { outline: 2px solid #777; outline-offset: 1px; }
+    .textarea-input:disabled { background: #f5f5f5; color: #777; cursor: not-allowed; }
+
     /* ── Print ───────────────────────────────────────────── */
     @media print {
       body { background: #fff; }
-      .admin-bar, .btn-save, .btn-clear, .toast { display: none; }
+      .btn-save, .btn-clear, .toast { display: none; }
       .page {
         width: 210mm; max-width: 210mm;
         margin: 0;
@@ -340,11 +358,6 @@
 </head>
 <body>
 
-<!-- Admin bar -->
-<div class="admin-bar">
-  <span>CUG Archival System &nbsp;&mdash;&nbsp; ICT Director Report</span>
-  <a href="/admin/">&#128196; Admin Dashboard</a>
-</div>
 
 {# Pass signature data safely via json_script #}
 {{ confirmation.signature_data|default:""|json_script:"__prev_sig__" }}
@@ -355,8 +368,8 @@
 <section class="page">
   <div class="header">
     <h1>
-      METASCHOLAR CONSULT LTD<br>
-      ARCHIVAL SYSTEM CORRECTIONS REPORT<br>
+      <span style="display:block;text-align:center;">METASCHOLAR CONSULT LTD</span>
+      University Digital Transformation Suite (UDTS)<br>
       FOR THE ICT DIRECTOR, CATHOLIC UNIVERSITY OF GHANA
     </h1>
   </div>
@@ -470,6 +483,14 @@
     </tbody>
   </table>
 
+  <!-- ── Other Comments (optional) ── -->
+  <div class="comments-section">
+    <h2>Other Comments <span style="font-weight:normal;font-size:14px;text-transform:none;">(Optional)</span></h2>
+    <textarea id="other-comments" class="textarea-input"
+      placeholder="Add any additional comments here…"
+      {% if has_submission and not is_editable %}disabled{% endif %}>{{ confirmation.other_comments|default:'' }}</textarea>
+  </div>
+
   <!-- ── Confirmation + Digital Signature ── -->
   <div class="signature-section">
     <h2>3.0 ICT Director Confirmation and Signature</h2>
@@ -581,7 +602,7 @@ document.getElementById('thank-you-modal').addEventListener('click', function(e)
 });
 
 function lockForm() {
-  ['director-name', 'conf-date'].forEach(id => {
+  ['director-name', 'conf-date', 'other-comments'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.disabled = true;
   });
@@ -723,12 +744,14 @@ window.addEventListener('load', function () {
 
 /* ── Save / Update confirmation ─────────────────────────── */
 function saveConfirmation() {
-  const nameEl  = document.getElementById('director-name');
-  const dateEl  = document.getElementById('conf-date');
-  const sigBox  = document.querySelector('.sig-container');
-  const name    = nameEl.value.trim();
-  const date    = dateEl.value;
-  const sigData = window.getSigData ? window.getSigData() : '';
+  const nameEl     = document.getElementById('director-name');
+  const dateEl     = document.getElementById('conf-date');
+  const commentsEl = document.getElementById('other-comments');
+  const sigBox     = document.querySelector('.sig-container');
+  const name       = nameEl.value.trim();
+  const date       = dateEl.value;
+  const comments   = commentsEl ? commentsEl.value.trim() : '';
+  const sigData    = window.getSigData ? window.getSigData() : '';
 
   /* ── Validation ──────────────────────────────────────── */
   // Clear previous error states
@@ -765,6 +788,7 @@ function saveConfirmation() {
     director_name:  name,
     signature_date: date,
     signature_data: sigData,
+    other_comments: comments,
   })
     .then(d => {
       if (d.success) {
