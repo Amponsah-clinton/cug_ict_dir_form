@@ -288,6 +288,12 @@ def delete_submission(request, submission_id):
         return JsonResponse({'error': str(e)}, status=500)
 
 
+# ── Thanks page ──────────────────────────────────────────────────────────────
+
+def thanks_view(request):
+    return render(request, 'report/thanks.html')
+
+
 # ── Print / PDF view ─────────────────────────────────────────────────────────
 
 def print_report(request, submission_id):

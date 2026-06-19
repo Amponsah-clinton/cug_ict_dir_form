@@ -542,7 +542,7 @@
 
     <button class="btn-save" id="btn-save" type="button" onclick="saveConfirmation()"
       {% if has_submission and not is_editable %}disabled{% endif %}>
-      {% if has_submission %}Update Confirmation{% else %}Save Confirmation{% endif %}
+      Save Confirmation
     </button>
   </div>
 
@@ -561,7 +561,7 @@
       The Metascholar Consult Ltd team has been notified and will
       process your response promptly.
     </p>
-    <button class="modal-close" onclick="closeThankYou()">Done</button>
+    <p style="margin-top:14px;font-size:13px;color:#94a3b8;">Redirecting you now…</p>
   </div>
 </div>
 
@@ -593,13 +593,8 @@ function postJSON(url, body) {
 /* ── Thank-you modal ────────────────────────────────────── */
 function showThankYou() {
   document.getElementById('thank-you-modal').classList.add('open');
+  setTimeout(() => { window.location.href = '/thanks/'; }, 2500);
 }
-function closeThankYou() {
-  document.getElementById('thank-you-modal').classList.remove('open');
-}
-document.getElementById('thank-you-modal').addEventListener('click', function(e) {
-  if (e.target === this) closeThankYou();
-});
 
 function lockForm() {
   ['director-name', 'conf-date', 'other-comments'].forEach(id => {
@@ -792,30 +787,21 @@ function saveConfirmation() {
   })
     .then(d => {
       if (d.success) {
-        if (d.updated) {
-          showToast('Confirmation updated successfully.');
-        } else {
-          showThankYou();
-        }
-        saveBtn.textContent = 'Update Confirmation';
-        saveBtn.disabled = false;
-      } else if (d.error === 'locked') {
-        showToast('Form is locked — edit window expired.', true);
-        lockForm();
+        showThankYou();
       } else if (d.error === 'name_exists') {
         showToast('A confirmation under this name has already been permanently recorded. Each director may only submit once.', true);
         saveBtn.disabled = false;
-        saveBtn.textContent = HAS_SUBMISSION ? 'Update Confirmation' : 'Save Confirmation';
+        saveBtn.textContent = 'Save Confirmation';
       } else if (d.error === 'name_required') {
         showToast('Please enter the name of the ICT Director.', true);
         const nameEl = document.getElementById('director-name');
         if (nameEl) { nameEl.classList.add('field-error'); nameEl.focus(); }
         saveBtn.disabled = false;
-        saveBtn.textContent = HAS_SUBMISSION ? 'Update Confirmation' : 'Save Confirmation';
+        saveBtn.textContent = 'Save Confirmation';
       } else {
         showToast('Error: ' + (d.error || '?'), true);
         saveBtn.disabled = false;
-        saveBtn.textContent = HAS_SUBMISSION ? 'Update Confirmation' : 'Save Confirmation';
+        saveBtn.textContent = 'Save Confirmation';
       }
     })
     .catch(() => {
