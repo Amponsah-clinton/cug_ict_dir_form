@@ -193,17 +193,38 @@
 
     td.td-no   { text-align: center; color: var(--muted); font-size: 12px; }
     td.td-done { text-align: center; }
-    td.td-resp { vertical-align: top; }
+    td.td-resp { vertical-align: middle; }
 
-    .ans-badge {
-      display: inline-block; font-size: 10px; font-weight: 600;
-      padding: 1px 7px; border-radius: 10px; line-height: 18px;
-      background: #e0f2fe; color: #0369a1; letter-spacing: 0.2px;
+    /* ── Response column ── */
+    .resp-cell { display: flex; flex-direction: column; gap: 3px; }
+
+    .done-toggle {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 11px; border-radius: 6px; border: none;
+      font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+      transition: background 0.12s, color 0.12s;
     }
-    .ans-badge-yes_no    { background: #dcfce7; color: #15803d; }
-    .ans-badge-true_false{ background: #fef3c7; color: #b45309; }
-    .ans-badge-text      { background: #f3e8ff; color: #7e22ce; }
-    .ans-badge-checkbox  { background: #e0f2fe; color: #0369a1; }
+    .done-toggle.is-done  { background: #dcfce7; color: #15803d; }
+    .done-toggle.not-done { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+    .done-toggle.is-done:hover  { background: #bbf7d0; }
+    .done-toggle.not-done:hover { background: #e2e8f0; }
+
+    .resp-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 6px;
+      font-size: 12px; font-weight: 600; width: fit-content;
+    }
+    .rp-yes   { background: #dcfce7; color: #15803d; }
+    .rp-no    { background: #fee2e2; color: #b91c1c; }
+    .rp-true  { background: #dcfce7; color: #15803d; }
+    .rp-false { background: #fee2e2; color: #b91c1c; }
+
+    .resp-empty { color: #94a3b8; font-size: 12px; font-style: italic; }
+    .resp-text-val { color: #374151; font-size: 12px; line-height: 1.4; word-break: break-word; }
+    .resp-type-tag {
+      font-size: 10px; font-weight: 500; color: #cbd5e1;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
 
     .type-select { font-size: 12px; padding: 4px 6px; }
 
@@ -605,7 +626,7 @@ function renderSection(sec, si) {
           <th>No.</th><th>Module / Section</th>
           <th>Correction Given by ICT Director</th>
           <th>Required System Update / Action</th>
-          <th>Response / Type</th><th>Actions</th>
+          <th>Response</th><th>Actions</th>
         </tr>
       </thead>
       <tbody id="tbody-${sec.section_key}">
@@ -620,20 +641,40 @@ function answerTypeLabel(t) {
   return { checkbox: 'Checkbox', yes_no: 'Yes / No', true_false: 'True / False', text: 'Text' }[t] || 'Checkbox';
 }
 
+function renderRespView(item) {
+  const atype = item.answer_type || 'checkbox';
+  const typeTag = `<span class="resp-type-tag">${answerTypeLabel(atype)}</span>`;
+
+  if (atype === 'checkbox') {
+    const cls = item.is_done ? 'is-done' : 'not-done';
+    const lbl = item.is_done ? '&#10003; Done' : '&#9675; Pending';
+    return `<button class="done-toggle ${cls}" onclick="toggleDone(${item.id}, this, '${item.correction_id}')">${lbl}</button>`;
+  }
+
+  const v = (item.answer_value || '').trim().toLowerCase();
+  if (atype === 'yes_no') {
+    const pill = v === 'yes' ? `<span class="resp-pill rp-yes">&#10003; Yes</span>`
+               : v === 'no'  ? `<span class="resp-pill rp-no">&#10005; No</span>`
+               :                `<span class="resp-empty">Not answered</span>`;
+    return `<div class="resp-cell">${pill}${typeTag}</div>`;
+  }
+  if (atype === 'true_false') {
+    const pill = v === 'true'  ? `<span class="resp-pill rp-true">&#10003; True</span>`
+               : v === 'false' ? `<span class="resp-pill rp-false">&#10005; False</span>`
+               :                  `<span class="resp-empty">Not answered</span>`;
+    return `<div class="resp-cell">${pill}${typeTag}</div>`;
+  }
+  if (atype === 'text') {
+    const display = item.answer_value
+      ? `<span class="resp-text-val">${esc(item.answer_value)}</span>`
+      : `<span class="resp-empty">Not answered</span>`;
+    return `<div class="resp-cell">${display}${typeTag}</div>`;
+  }
+  return '';
+}
+
 function renderItemRow(item, sec, ii) {
   const atype = item.answer_type || 'checkbox';
-
-  // View mode: badge + either done-checkbox (checkbox type) or current answer value
-  let viewContent;
-  if (atype === 'checkbox') {
-    viewContent = `<span class="ans-badge ans-badge-checkbox">Checkbox</span><br>
-      <input type="checkbox" class="done-check" ${item.is_done ? 'checked' : ''}
-        onchange="toggleDone(${item.id}, this, '${item.correction_id}')">`;
-  } else {
-    const val = item.answer_value ? esc(item.answer_value) : '';
-    viewContent = `<span class="ans-badge ans-badge-${atype}">${answerTypeLabel(atype)}</span><br>
-      <span style="font-size:12px;color:#374151">${val || '<em style="color:#94a3b8">—</em>'}</span>`;
-  }
 
   // Edit mode: type dropdown + is_done checkbox
   const sel = (v) => atype === v ? ' selected' : '';
@@ -667,7 +708,7 @@ function renderItemRow(item, sec, ii) {
       <textarea class="cell-edit cell-input" rows="3" data-field="action">${esc(item.action)}</textarea>
     </td>
     <td class="td-resp">
-      <span class="cell-view">${viewContent}</span>
+      <span class="cell-view">${renderRespView(item)}</span>
       ${editContent}
     </td>
     <td>
@@ -788,8 +829,11 @@ function saveRow(itemId, sectionKey, correctionId) {
 
 // ── Toggle done ───────────────────────────────────────────────────────────────
 
-function toggleDone(itemId, checkbox, correctionId) {
-  const val = checkbox.checked;
+function toggleDone(itemId, el, correctionId) {
+  // el is either a checkbox input or a .done-toggle button
+  const isChk = el.type === 'checkbox';
+  const val = isChk ? el.checked : el.classList.contains('not-done');
+
   Promise.all([
     post(`/admin/api/corrections/${itemId}/update/`, { is_done: val }),
     post('/api/update-correction/', { correction_id: correctionId, is_done: val }),
@@ -800,11 +844,15 @@ function toggleDone(itemId, checkbox, correctionId) {
         const item = sec.items.find(i => i.id === itemId);
         if (item) item.is_done = val;
       }
+      if (!isChk) renderSections();
     } else {
       toast('Failed: ' + (d.error || '?'), true);
-      checkbox.checked = !val;
+      if (isChk) el.checked = !val;
     }
-  }).catch(() => { toast('Network error.', true); checkbox.checked = !val; });
+  }).catch(() => {
+    toast('Network error.', true);
+    if (isChk) el.checked = !val;
+  });
 }
 
 // ── Delete item ───────────────────────────────────────────────────────────────
