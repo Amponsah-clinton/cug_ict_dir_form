@@ -289,6 +289,18 @@ def delete_submission(request, submission_id):
         return JsonResponse({'error': str(e)}, status=500)
 
 
+# ── API: reset all correction checkboxes ─────────────────────────────────────
+
+@require_http_methods(['POST'])
+def reset_corrections(request):
+    try:
+        svc = get_service_client()
+        svc.table('cug_corrections').update({'is_done': False}).neq('id', 0).execute()
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
 # ── Print / PDF view ─────────────────────────────────────────────────────────
 
 def print_report(request, submission_id):
