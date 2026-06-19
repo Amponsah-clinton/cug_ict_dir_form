@@ -1,0 +1,36 @@
+{% comment %}
+  Included inside each correction <td> on the public form.
+  Context variables available: item (with answer_type, id, num)
+{% endcomment %}
+{% if item.answer_type == "yes_no" %}
+  <div class="radio-group" data-id="{{ item.id }}">
+    <label class="radio-opt">
+      <input type="radio" name="ans_{{ item.id }}" value="yes" class="radio-ans"> Yes
+    </label>
+    <label class="radio-opt">
+      <input type="radio" name="ans_{{ item.id }}" value="no" class="radio-ans"> No
+    </label>
+    <span class="saving-dot"></span>
+  </div>
+{% elif item.answer_type == "true_false" %}
+  <div class="radio-group" data-id="{{ item.id }}">
+    <label class="radio-opt">
+      <input type="radio" name="ans_{{ item.id }}" value="true" class="radio-ans"> True
+    </label>
+    <label class="radio-opt">
+      <input type="radio" name="ans_{{ item.id }}" value="false" class="radio-ans"> False
+    </label>
+    <span class="saving-dot"></span>
+  </div>
+{% elif item.answer_type == "text" %}
+  <div style="position:relative">
+    <textarea class="ans-text" data-id="{{ item.id }}" rows="2"
+      placeholder="Enter response…"></textarea>
+    <span class="saving-dot" style="position:absolute;bottom:4px;right:6px"></span>
+  </div>
+{% else %}
+  <div style="display:flex;align-items:center;gap:6px">
+    <input type="checkbox" class="checkbox" data-id="{{ item.id }}">
+    <span class="saving-dot"></span>
+  </div>
+{% endif %}

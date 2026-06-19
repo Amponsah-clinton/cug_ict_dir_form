@@ -6,7 +6,12 @@ urlpatterns = [
 
     # Public form API endpoints
     path('api/update-correction/', views.update_correction, name='update_correction'),
+    path('api/save-answer/', views.save_answer, name='save_answer'),
     path('api/save-confirmation/', views.save_confirmation, name='save_confirmation'),
+
+    # Admin auth
+    path('admin/login/', views.admin_login, name='admin_login'),
+    path('admin/logout/', views.admin_logout, name='admin_logout'),
 
     # Admin dashboard
     path('admin/', views.admin_dashboard, name='admin_dashboard'),

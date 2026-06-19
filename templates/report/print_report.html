@@ -49,7 +49,7 @@
     .page {
       width: 210mm;
       min-height: 297mm;
-      margin: 80px auto 30px;  /* 80px top = clear the fixed print-bar */
+      margin: 80px auto 30px;
       padding: 20mm 18mm 18mm;
       background: #fff;
       position: relative;
@@ -80,7 +80,10 @@
       border-collapse: collapse;
       table-layout: fixed;
       font-size: 13.5px;
+      page-break-inside: auto;
     }
+
+    tr { page-break-inside: avoid; }
 
     th, td {
       border: 1px solid #777;
@@ -93,13 +96,14 @@
     col.c-no         { width: 5%; }
     col.c-module      { width: 14%; }
     col.c-correction  { width: 30%; }
-    col.c-action      { width: 31%; }
-    col.c-tick        { width: 20%; }
+    col.c-action      { width: 29%; }
+    col.c-tick        { width: 22%; }
 
     td:first-child { text-align: center; font-style: italic; }
 
-    /* ── Checkboxes ────────────────────────────────── */
-    .tick-cell { text-align: center; }
+    /* ── Response cell ── */
+    .tick-cell { text-align: center; vertical-align: middle; }
+
     .tick-done {
       display: inline-block;
       width: 15px; height: 15px;
@@ -121,14 +125,34 @@
       border: 1.5px solid #999;
     }
 
+    .ans-text-val {
+      font-size: 12.5px;
+      font-family: Arial, sans-serif;
+      color: #333;
+    }
+    .ans-badge-print {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: bold;
+      border: 1px solid #aaa;
+      border-radius: 3px;
+      padding: 0 4px;
+      font-family: Arial, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    /* ── Section block ── */
+    .section-block { margin-bottom: 24px; }
+
     /* ── Footer ──────────────────────────────────────── */
-    .footer {
-      position: absolute;
-      bottom: 10mm;
-      left: 0; right: 0;
+    .report-footer {
+      margin-top: 14px;
+      font-size: 12.5px;
+      color: #555;
       text-align: center;
-      font-size: 13px;
-      color: #666;
+      border-top: 1px solid #ccc;
+      padding-top: 8px;
     }
 
     /* ── Signature section ───────────────────────────── */
@@ -212,9 +236,7 @@
   <button class="btn-print" onclick="window.print()">&#128424; Save as PDF / Print</button>
 </div>
 
-{% with s1=sections.0 s2=sections.1 %}
-
-<!-- ══════════════ PAGE 1 ══════════════ -->
+<!-- ══════════════ MAIN CONTENT PAGE ══════════════ -->
 <section class="page">
   <div class="header">
     <h1 style="text-align:center;">
@@ -232,117 +254,59 @@
     <p style="margin-top:6px"><strong>Report Generated:</strong> {{ submitted_at }}</p>
   </div>
 
-  <h2>{{ s1.title }}</h2>
-  <table>
-    <colgroup>
-      <col class="c-no"><col class="c-module"><col class="c-correction">
-      <col class="c-action"><col class="c-tick">
-    </colgroup>
-    <thead>
-      <tr>
-        <th>No.</th><th>Module / Section</th>
-        <th>Correction Given by ICT Director</th>
-        <th>Required System Update / Action</th>
-        <th>Tick if Done</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in s1.items %}{% if item.num <= 9 %}
-      <tr>
-        <td>{{ item.num }}</td>
-        <td>{{ item.module }}</td>
-        <td>{{ item.correction }}</td>
-        <td>{{ item.action }}</td>
-        <td class="tick-cell">
-          {% if item.id in done_set %}<span class="tick-done"></span>{% else %}<span class="tick-empty"></span>{% endif %}
-        </td>
-      </tr>
-      {% endif %}{% endfor %}
-    </tbody>
-  </table>
+  {% for section in sections %}
+  <div class="section-block">
+    <h2>{{ section.title }}</h2>
+    <table>
+      <colgroup>
+        <col class="c-no"><col class="c-module"><col class="c-correction">
+        <col class="c-action"><col class="c-tick">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Module / Section</th>
+          <th>Correction Given by ICT Director</th>
+          <th>Required System Update / Action</th>
+          <th>Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in section.items %}
+        <tr>
+          <td>{{ item.num }}</td>
+          <td>{{ item.module }}</td>
+          <td>{{ item.correction }}</td>
+          <td>{{ item.action }}</td>
+          <td class="tick-cell">
+            {% if item.answer_type == "yes_no" %}
+              <span class="ans-badge-print">Yes / No</span><br>
+              <span class="ans-text-val">{{ item.answer_value|default:"—"|title }}</span>
+            {% elif item.answer_type == "true_false" %}
+              <span class="ans-badge-print">True / False</span><br>
+              <span class="ans-text-val">{{ item.answer_value|default:"—"|title }}</span>
+            {% elif item.answer_type == "text" %}
+              <span class="ans-text-val">{{ item.answer_value|default:"" }}</span>
+            {% else %}
+              {% if item.is_done or item.id in done_set %}<span class="tick-done"></span>{% else %}<span class="tick-empty"></span>{% endif %}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endfor %}
 
-  <div class="footer">Page 1 of 3 &nbsp;·&nbsp; {{ done_count }} of {{ total }} corrections completed</div>
+  <div class="report-footer">{{ done_count }} of {{ total }} corrections completed &nbsp;·&nbsp; Submitted {{ submitted_at }}</div>
 </section>
 
-<!-- ══════════════ PAGE 2 ══════════════ -->
+<!-- ══════════════ SIGNATURE PAGE ══════════════ -->
 <section class="page">
-  <table>
-    <colgroup>
-      <col class="c-no"><col class="c-module"><col class="c-correction">
-      <col class="c-action"><col class="c-tick">
-    </colgroup>
-    <tbody>
-      {% for item in s1.items %}{% if item.num >= 10 %}
-      <tr>
-        <td>{{ item.num }}</td>
-        <td>{{ item.module }}</td>
-        <td>{{ item.correction }}</td>
-        <td>{{ item.action }}</td>
-        <td class="tick-cell">
-          {% if item.id in done_set %}<span class="tick-done"></span>{% else %}<span class="tick-empty"></span>{% endif %}
-        </td>
-      </tr>
-      {% endif %}{% endfor %}
-    </tbody>
-  </table>
-
-  <h2>{{ s2.title }}</h2>
-  <table>
-    <colgroup>
-      <col class="c-no"><col class="c-module"><col class="c-correction">
-      <col class="c-action"><col class="c-tick">
-    </colgroup>
-    <thead>
-      <tr>
-        <th>No.</th><th>Module / Section</th>
-        <th>Correction Given by ICT Director</th>
-        <th>Required System Update / Action</th>
-        <th>Tick if Done</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in s2.items %}{% if item.num <= 5 %}
-      <tr>
-        <td>{{ item.num }}</td>
-        <td>{{ item.module }}</td>
-        <td>{{ item.correction }}</td>
-        <td>{{ item.action }}</td>
-        <td class="tick-cell">
-          {% if item.id in done_set %}<span class="tick-done"></span>{% else %}<span class="tick-empty"></span>{% endif %}
-        </td>
-      </tr>
-      {% endif %}{% endfor %}
-    </tbody>
-  </table>
-
-  <div class="footer">Page 2 of 3 &nbsp;·&nbsp; {{ done_count }} of {{ total }} corrections completed</div>
-</section>
-
-<!-- ══════════════ PAGE 3 ══════════════ -->
-<section class="page">
-  <table>
-    <colgroup>
-      <col class="c-no"><col class="c-module"><col class="c-correction">
-      <col class="c-action"><col class="c-tick">
-    </colgroup>
-    <tbody>
-      {% for item in s2.items %}{% if item.num >= 6 %}
-      <tr>
-        <td>{{ item.num }}</td>
-        <td>{{ item.module }}</td>
-        <td>{{ item.correction }}</td>
-        <td>{{ item.action }}</td>
-        <td class="tick-cell">
-          {% if item.id in done_set %}<span class="tick-done"></span>{% else %}<span class="tick-empty"></span>{% endif %}
-        </td>
-      </tr>
-      {% endif %}{% endfor %}
-    </tbody>
-  </table>
 
   <!-- ── Other Comments ── -->
   {% if confirmation.other_comments %}
-  <div style="margin-top:22px;">
+  <div style="margin-bottom:22px;">
     <h2 style="font-size:15px;font-weight:bold;text-transform:uppercase;margin:0 0 8px;">Other Comments</h2>
     <p style="font-size:14.5px;border:1px solid #ccc;border-radius:4px;padding:8px 10px;background:#fafafa;">{{ confirmation.other_comments }}</p>
   </div>
@@ -350,10 +314,10 @@
 
   <!-- ── Confirmation with real rendered signature ── -->
   <div class="sig-section">
-    <h2>3.0 ICT Director Confirmation and Signature</h2>
+    <h2>ICT Director Confirmation and Signature</h2>
     <p class="intro">
       I hereby confirm that the corrections listed above have been reviewed and that the items
-      ticked in the table have been duly completed.
+      ticked / responded to in the table have been duly completed.
     </p>
 
     <div class="field-row">
@@ -382,9 +346,8 @@
     {% endif %}
   </div>
 
-  <div class="footer">Page 3 of 3 &nbsp;·&nbsp; Submitted {{ submitted_at }}</div>
+  <div class="report-footer">Submitted {{ submitted_at }} &nbsp;·&nbsp; Metascholar Consult Ltd</div>
 </section>
 
-{% endwith %}
 </body>
 </html>

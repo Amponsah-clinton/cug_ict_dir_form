@@ -1,8 +1,10 @@
 import json
 import os
 import uuid
+import hmac
+import functools
 from datetime import datetime, timezone, timedelta
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect
 from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_http_methods
 from django.core.mail import EmailMultiAlternatives
@@ -13,6 +15,19 @@ from .corrections_data import SECTIONS
 EDIT_WINDOW = getattr(settings, 'FORM_EDIT_WINDOW', 600)
 NOTIFY = getattr(settings, 'FORM_NOTIFICATION_EMAILS', [])
 TOTAL_CORRECTIONS = sum(len(s['items']) for s in SECTIONS)
+
+_ADMIN_EMAIL    = 'metascholarlimited@gmail.com'
+_ADMIN_PASSWORD = 'Scholar2025@'
+
+
+def admin_login_required(view_func):
+    """Session guard — redirects to admin login if not authenticated."""
+    @functools.wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.session.get('admin_logged_in'):
+            return redirect('admin_login')
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -128,6 +143,8 @@ def _fetch_all_corrections_supabase():
                 'correction': row.get('correction', ''),
                 'action': row.get('action', ''),
                 'is_done': row.get('is_done', False),
+                'answer_type': row.get('answer_type', 'checkbox'),
+                'answer_value': row.get('answer_value') or '',
             })
 
         return [sections_map[sk] for sk in sections_order], True
@@ -236,6 +253,28 @@ def update_correction(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
+# ── API: save Director's answer (yes_no / true_false / text types) ───────────
+
+@require_http_methods(['POST'])
+def save_answer(request):
+    """Persist the Director's typed/selected answer for a non-checkbox item."""
+    try:
+        data          = json.loads(request.body)
+        correction_id = data.get('correction_id', '').strip()
+        answer_value  = data.get('answer_value', '').strip()
+        if not correction_id:
+            return JsonResponse({'error': 'correction_id required'}, status=400)
+
+        svc     = get_service_client()
+        now_iso = datetime.now(timezone.utc).isoformat()
+        svc.table('cug_correction_items').update(
+            {'answer_value': answer_value or None, 'updated_at': now_iso}
+        ).eq('correction_id', correction_id).execute()
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
 # ── API: save confirmation (name + signature + date) ─────────────────────────
 
 @require_http_methods(['POST'])
@@ -294,8 +333,37 @@ def save_confirmation(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
+# ── Admin login / logout ─────────────────────────────────────────────────────
+
+@require_http_methods(['GET', 'POST'])
+def admin_login(request):
+    if request.session.get('admin_logged_in'):
+        return redirect('admin_dashboard')
+
+    error = None
+    if request.method == 'POST':
+        email    = request.POST.get('email', '').strip().lower()
+        password = request.POST.get('password', '')
+        email_ok = hmac.compare_digest(email, _ADMIN_EMAIL.lower())
+        pass_ok  = hmac.compare_digest(password, _ADMIN_PASSWORD)
+        if email_ok and pass_ok:
+            request.session['admin_logged_in'] = True
+            request.session.set_expiry(28800)  # 8 hours
+            return redirect('admin_dashboard')
+        error = 'Invalid email or password. Please try again.'
+
+    return render(request, 'report/admin_login.html', {'error': error})
+
+
+@require_http_methods(['GET', 'POST'])
+def admin_logout(request):
+    request.session.flush()
+    return redirect('admin_login')
+
+
 # ── Admin dashboard ───────────────────────────────────────────────────────────
 
+@admin_login_required
 def admin_dashboard(request):
     client = get_client()
 
@@ -363,6 +431,7 @@ def admin_dashboard(request):
 # ── API: delete a submission ─────────────────────────────────────────────────
 
 @require_http_methods(['POST'])
+@admin_login_required
 def delete_submission(request, submission_id):
     try:
         svc = get_service_client()
@@ -386,6 +455,7 @@ def thanks_view(request):
 
 # ── Print / PDF view ─────────────────────────────────────────────────────────
 
+@admin_login_required
 def print_report(request, submission_id):
     client = get_client()
 
@@ -426,6 +496,7 @@ def print_report(request, submission_id):
 # ── Admin: Corrections Manager API ───────────────────────────────────────────
 
 @require_http_methods(['GET'])
+@admin_login_required
 def admin_get_corrections(request):
     """Return all sections + items as JSON."""
     sections, seeded = _fetch_all_corrections_supabase()
@@ -447,6 +518,8 @@ def admin_get_corrections(request):
                     'correction': item['correction'],
                     'action': item['action'],
                     'is_done': item['is_done'],
+                    'answer_type': item.get('answer_type', 'checkbox'),
+                    'answer_value': item.get('answer_value', ''),
                 }
                 for item in sec['items']
             ],
@@ -455,6 +528,7 @@ def admin_get_corrections(request):
 
 
 @require_http_methods(['POST'])
+@admin_login_required
 def admin_seed_corrections(request):
     """Seed cug_correction_items from static corrections_data.SECTIONS."""
     try:
@@ -498,6 +572,7 @@ def admin_seed_corrections(request):
 
 
 @require_http_methods(['POST'])
+@admin_login_required
 def admin_add_correction_item(request):
     """Add a new correction item to a section."""
     try:
@@ -509,6 +584,9 @@ def admin_add_correction_item(request):
         module        = data.get('module', '').strip()
         correction    = data.get('correction', '').strip()
         action        = data.get('action', '').strip()
+        answer_type   = data.get('answer_type', 'checkbox').strip()
+        if answer_type not in ('checkbox', 'yes_no', 'true_false', 'text'):
+            answer_type = 'checkbox'
 
         if not section_key:
             return JsonResponse({'error': 'section_key required'}, status=400)
@@ -527,6 +605,8 @@ def admin_add_correction_item(request):
             'correction': correction,
             'action': action,
             'is_done': False,
+            'answer_type': answer_type,
+            'answer_value': None,
         }).execute()
 
         new_row = result.data[0] if result.data else {}
@@ -538,12 +618,15 @@ def admin_add_correction_item(request):
             'correction': correction,
             'action': action,
             'is_done': False,
+            'answer_type': answer_type,
+            'answer_value': '',
         }})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
 
 @require_http_methods(['POST'])
+@admin_login_required
 def admin_update_correction_item(request, item_id):
     """Update fields of an existing correction item."""
     try:
@@ -552,7 +635,7 @@ def admin_update_correction_item(request, item_id):
         now_iso = datetime.now(timezone.utc).isoformat()
 
         update_data = {'updated_at': now_iso}
-        for field in ('num', 'module', 'correction', 'action', 'is_done', 'section_title'):
+        for field in ('num', 'module', 'correction', 'action', 'is_done', 'section_title', 'answer_type', 'answer_value'):
             if field in data:
                 if field == 'num':
                     update_data[field] = int(data[field])
@@ -568,6 +651,7 @@ def admin_update_correction_item(request, item_id):
 
 
 @require_http_methods(['POST'])
+@admin_login_required
 def admin_delete_correction_item(request, item_id):
     """Delete a single correction item."""
     try:
@@ -579,6 +663,7 @@ def admin_delete_correction_item(request, item_id):
 
 
 @require_http_methods(['POST'])
+@admin_login_required
 def admin_add_section(request):
     """Register a new section (returns metadata; items added separately)."""
     try:
@@ -613,6 +698,7 @@ def admin_add_section(request):
 
 
 @require_http_methods(['POST'])
+@admin_login_required
 def admin_update_section_title(request, section_key):
     """Rename a section (updates all rows that share this section_key)."""
     try:
@@ -632,6 +718,7 @@ def admin_update_section_title(request, section_key):
 
 
 @require_http_methods(['POST'])
+@admin_login_required
 def admin_delete_section(request, section_key):
     """Delete all items in a section."""
     try:

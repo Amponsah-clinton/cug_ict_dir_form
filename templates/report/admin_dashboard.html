@@ -186,13 +186,26 @@
 
     col.cn  { width: 4%; }
     col.cm  { width: 12%; }
-    col.cc  { width: 28%; }
-    col.ca  { width: 28%; }
-    col.cd  { width: 7%; text-align: center; }
-    col.cac { width: 21%; }
+    col.cc  { width: 24%; }
+    col.ca  { width: 24%; }
+    col.cd  { width: 14%; }
+    col.cac { width: 22%; }
 
-    td.td-no { text-align: center; color: var(--muted); font-size: 12px; }
+    td.td-no   { text-align: center; color: var(--muted); font-size: 12px; }
     td.td-done { text-align: center; }
+    td.td-resp { vertical-align: top; }
+
+    .ans-badge {
+      display: inline-block; font-size: 10px; font-weight: 600;
+      padding: 1px 7px; border-radius: 10px; line-height: 18px;
+      background: #e0f2fe; color: #0369a1; letter-spacing: 0.2px;
+    }
+    .ans-badge-yes_no    { background: #dcfce7; color: #15803d; }
+    .ans-badge-true_false{ background: #fef3c7; color: #b45309; }
+    .ans-badge-text      { background: #f3e8ff; color: #7e22ce; }
+    .ans-badge-checkbox  { background: #e0f2fe; color: #0369a1; }
+
+    .type-select { font-size: 12px; padding: 4px 6px; }
 
     /* ── Inline edit inputs ── */
     .cell-view  { display: block; }
@@ -292,6 +305,7 @@
   <nav class="topbar-nav">
     <a href="/">View Form</a>
     <a href="/" class="btn-primary">Go to Report Form</a>
+    <a href="/admin/logout/" style="color:#f87171;border:1px solid #7f1d1d;border-radius:5px;padding:5px 13px;font-size:13px;">Sign Out</a>
   </nav>
 </header>
 
@@ -591,7 +605,7 @@ function renderSection(sec, si) {
           <th>No.</th><th>Module / Section</th>
           <th>Correction Given by ICT Director</th>
           <th>Required System Update / Action</th>
-          <th>Done</th><th>Actions</th>
+          <th>Response / Type</th><th>Actions</th>
         </tr>
       </thead>
       <tbody id="tbody-${sec.section_key}">
@@ -602,10 +616,37 @@ function renderSection(sec, si) {
   </div>`;
 }
 
+function answerTypeLabel(t) {
+  return { checkbox: 'Checkbox', yes_no: 'Yes / No', true_false: 'True / False', text: 'Text' }[t] || 'Checkbox';
+}
+
 function renderItemRow(item, sec, ii) {
-  const doneCheck = item.is_done
-    ? `<input type="checkbox" class="done-check" checked onchange="toggleDone(${item.id}, this, '${item.correction_id}')">`
-    : `<input type="checkbox" class="done-check" onchange="toggleDone(${item.id}, this, '${item.correction_id}')">`;
+  const atype = item.answer_type || 'checkbox';
+
+  // View mode: badge + either done-checkbox (checkbox type) or current answer value
+  let viewContent;
+  if (atype === 'checkbox') {
+    viewContent = `<span class="ans-badge ans-badge-checkbox">Checkbox</span><br>
+      <input type="checkbox" class="done-check" ${item.is_done ? 'checked' : ''}
+        onchange="toggleDone(${item.id}, this, '${item.correction_id}')">`;
+  } else {
+    const val = item.answer_value ? esc(item.answer_value) : '';
+    viewContent = `<span class="ans-badge ans-badge-${atype}">${answerTypeLabel(atype)}</span><br>
+      <span style="font-size:12px;color:#374151">${val || '<em style="color:#94a3b8">—</em>'}</span>`;
+  }
+
+  // Edit mode: type dropdown + is_done checkbox
+  const sel = (v) => atype === v ? ' selected' : '';
+  const editContent = `
+    <select class="cell-edit cell-input type-select" data-field="answer_type" style="width:100%;margin-bottom:5px">
+      <option value="checkbox"${sel('checkbox')}>Checkbox</option>
+      <option value="yes_no"${sel('yes_no')}>Yes / No</option>
+      <option value="true_false"${sel('true_false')}>True / False</option>
+      <option value="text"${sel('text')}>Text</option>
+    </select>
+    <label class="cell-edit" style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px;cursor:pointer">
+      <input type="checkbox" class="done-check" data-field="is_done"${item.is_done ? ' checked' : ''}> Done
+    </label>`;
 
   return `
   <tr id="row-item-${item.id}">
@@ -625,7 +666,10 @@ function renderItemRow(item, sec, ii) {
       <span class="cell-view">${esc(item.action)}</span>
       <textarea class="cell-edit cell-input" rows="3" data-field="action">${esc(item.action)}</textarea>
     </td>
-    <td class="td-done">${doneCheck}</td>
+    <td class="td-resp">
+      <span class="cell-view">${viewContent}</span>
+      ${editContent}
+    </td>
     <td>
       <div class="row-actions">
         <span class="cell-view" style="display:inline-flex;gap:5px">
@@ -655,7 +699,15 @@ function renderAddRow(sec) {
     <td><textarea class="cell-input" rows="2" id="ni-module-${sec.section_key}" placeholder="Module / Section"></textarea></td>
     <td><textarea class="cell-input" rows="3" id="ni-correction-${sec.section_key}" placeholder="Correction given by ICT Director"></textarea></td>
     <td><textarea class="cell-input" rows="3" id="ni-action-${sec.section_key}" placeholder="Required system update / action"></textarea></td>
-    <td></td>
+    <td>
+      <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px;font-weight:600">Answer Type</label>
+      <select class="cell-input type-select" id="ni-answer-type-${sec.section_key}" style="width:100%">
+        <option value="checkbox">Checkbox</option>
+        <option value="yes_no">Yes / No</option>
+        <option value="true_false">True / False</option>
+        <option value="text">Text</option>
+      </select>
+    </td>
     <td>
       <div style="display:flex;gap:6px;flex-direction:column">
         <button class="btn btn-green" style="font-size:12px;width:100%" onclick="submitNewItem('${sec.section_key}', '${esc(sec.section_title)}', ${sec.section_order})">&#10003; Save Row</button>
@@ -704,22 +756,26 @@ function cancelEditRow(itemId) {
 function saveRow(itemId, sectionKey, correctionId) {
   const row = document.getElementById(`row-item-${itemId}`);
   const inputs = {};
-  row.querySelectorAll('.cell-edit.cell-input, .cell-edit textarea, .cell-edit input').forEach(el => {
-    if (el.dataset.field) inputs[el.dataset.field] = el.tagName === 'TEXTAREA' ? el.value : el.value;
+  row.querySelectorAll(
+    '.cell-edit.cell-input, .cell-edit textarea, .cell-edit input[data-field], .cell-edit select[data-field]'
+  ).forEach(el => {
+    if (!el.dataset.field) return;
+    inputs[el.dataset.field] = el.type === 'checkbox' ? el.checked : el.value;
   });
 
   post(`/admin/api/corrections/${itemId}/update/`, inputs)
     .then(d => {
       if (d.success) {
         toast('Row saved.');
-        // Update local cache
         for (const sec of _sections) {
           const item = sec.items.find(i => i.id === itemId);
           if (item) {
-            if (inputs.num)        item.num        = parseInt(inputs.num);
-            if (inputs.module      !== undefined) item.module     = inputs.module;
-            if (inputs.correction  !== undefined) item.correction = inputs.correction;
-            if (inputs.action      !== undefined) item.action     = inputs.action;
+            if (inputs.num        !== undefined) item.num         = parseInt(inputs.num);
+            if (inputs.module     !== undefined) item.module      = inputs.module;
+            if (inputs.correction !== undefined) item.correction  = inputs.correction;
+            if (inputs.action     !== undefined) item.action      = inputs.action;
+            if (inputs.answer_type!== undefined) item.answer_type = inputs.answer_type;
+            if (inputs.is_done    !== undefined) item.is_done     = inputs.is_done;
           }
         }
         renderSections();
@@ -790,10 +846,11 @@ function hideNewItemForm(sectionKey) {
 }
 
 function submitNewItem(sectionKey, sectionTitle, sectionOrder) {
-  const num        = document.getElementById(`ni-num-${sectionKey}`).value.trim();
-  const module     = document.getElementById(`ni-module-${sectionKey}`).value.trim();
-  const correction = document.getElementById(`ni-correction-${sectionKey}`).value.trim();
-  const action     = document.getElementById(`ni-action-${sectionKey}`).value.trim();
+  const num         = document.getElementById(`ni-num-${sectionKey}`).value.trim();
+  const module      = document.getElementById(`ni-module-${sectionKey}`).value.trim();
+  const correction  = document.getElementById(`ni-correction-${sectionKey}`).value.trim();
+  const action      = document.getElementById(`ni-action-${sectionKey}`).value.trim();
+  const answer_type = document.getElementById(`ni-answer-type-${sectionKey}`).value;
 
   if (!module && !correction && !action) {
     toast('Please fill in at least one field.', true); return;
@@ -804,13 +861,13 @@ function submitNewItem(sectionKey, sectionTitle, sectionOrder) {
     section_title: sectionTitle,
     section_order: sectionOrder,
     num: num || 1,
-    module, correction, action,
+    module, correction, action, answer_type,
   })
     .then(d => {
       if (d.success && d.item) {
         toast('Row added.');
         const sec = _sections.find(s => s.section_key === sectionKey);
-        if (sec) sec.items.push({ ...d.item, is_done: false });
+        if (sec) sec.items.push({ ...d.item, is_done: false, answer_type: d.item.answer_type || answer_type });
         renderSections();
       } else {
         toast('Add failed: ' + (d.error || '?'), true);

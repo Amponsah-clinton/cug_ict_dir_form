@@ -16,7 +16,7 @@
       line-height: 1.2;
     }
 
-    /* ── Top admin link bar ──────────────────────────────── */
+    /* ── Top admin link bar ── */
     .admin-bar {
       background: #0f172a;
       color: #94a3b8;
@@ -49,288 +49,206 @@
       box-shadow: 0 4px 24px rgba(0,0,0,0.22);
     }
 
-    /* ── Header ── */
     .header { margin-bottom: 18px; }
-    .header h1 {
-      font-size: 21px;
-      line-height: 1.15;
-      margin: 0;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
+    .header h1 { font-size: 21px; line-height: 1.15; margin: 0; font-weight: bold; text-transform: uppercase; }
 
     .meta { font-size: 16px; margin: 20px 0 28px; }
     .meta p { margin: 0 0 3px; }
 
-    h2 {
-      font-size: 17px;
-      margin: 24px 0 14px;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
+    h2 { font-size: 17px; margin: 24px 0 14px; font-weight: bold; text-transform: uppercase; }
 
     /* ── Table ── */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-      font-size: 15px;
-    }
-
-    th, td {
-      border: 1px solid #777;
-      padding: 7px 10px;
-      vertical-align: top;
-    }
-
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 15px; }
+    th, td { border: 1px solid #777; padding: 7px 10px; vertical-align: top; }
     th { text-align: left; font-weight: bold; background: #fafafa; }
 
     col.c-no         { width: 5%; }
     col.c-module      { width: 14%; }
-    col.c-correction  { width: 31%; }
-    col.c-action      { width: 31%; }
-    col.c-tick        { width: 19%; }
+    col.c-correction  { width: 30%; }
+    col.c-action      { width: 30%; }
+    col.c-resp        { width: 21%; }
 
     td:first-child { text-align: center; font-style: italic; }
 
+    /* ── Checkbox answer ── */
     .checkbox {
       width: 15px; height: 15px;
-      cursor: pointer;
-      accent-color: #111;
-      margin-top: 1px;
+      cursor: pointer; accent-color: #111; margin-top: 1px;
     }
     .checkbox:disabled { cursor: not-allowed; opacity: 0.5; }
+
+    /* ── Yes / No  &  True / False answer ── */
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .radio-opt {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-family: system-ui, sans-serif;
+      cursor: pointer;
+      user-select: none;
+    }
+    .radio-opt input[type="radio"] {
+      width: 15px; height: 15px;
+      accent-color: #111;
+      cursor: pointer;
+      margin: 0;
+      flex-shrink: 0;
+    }
+
+    /* ── Text answer ── */
+    .ans-text {
+      width: 100%;
+      min-height: 34px;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      padding: 4px 7px;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 14px;
+      color: #111;
+      background: #fff;
+      resize: vertical;
+    }
+    .ans-text:focus { outline: 2px solid #777; outline-offset: 1px; }
+
+    /* ── Saving indicator ── */
+    .saving-dot {
+      display: inline-block;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #94a3b8;
+      margin-left: 4px;
+      vertical-align: middle;
+      transition: background 0.3s;
+    }
+    .saving-dot.saving { background: #f59e0b; }
+    .saving-dot.saved  { background: #22c55e; }
 
     /* ── Footer ── */
     .footer {
       position: absolute;
-      bottom: 14mm;
-      left: 0; right: 0;
-      text-align: center;
-      font-size: 15px;
-      color: #666;
+      bottom: 14mm; left: 0; right: 0;
+      text-align: center; font-size: 15px; color: #666;
     }
 
     /* ── Signature section ── */
     .signature-section { margin-top: 30px; }
-    .signature-section > .intro {
-      font-size: 16px;
-      font-style: italic;
-      margin: 0 0 28px;
-      line-height: 1.5;
-    }
+    .signature-section > .intro { font-size: 16px; font-style: italic; margin: 0 0 28px; line-height: 1.5; }
 
-    .field-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 18px;
-      margin: 22px 0;
-      font-size: 16px;
-    }
-
-    .field-label {
-      white-space: nowrap;
-      padding-top: 7px;
-      min-width: 230px;
-    }
-
+    .field-row { display: flex; align-items: flex-start; gap: 18px; margin: 22px 0; font-size: 16px; }
+    .field-label { white-space: nowrap; padding-top: 7px; min-width: 230px; }
     .field-control { flex: 1; }
 
     .text-input,
     .date-input {
-      width: 100%;
-      height: 40px;
-      border: 1px solid #aaa;
-      border-radius: 5px;
+      width: 100%; height: 40px;
+      border: 1px solid #aaa; border-radius: 5px;
       padding: 5px 12px;
       font-family: "Times New Roman", Times, serif;
-      font-size: 15.5px;
-      color: #111;
-      background: #fff;
+      font-size: 15.5px; color: #111; background: #fff;
     }
-
     .text-input:focus, .date-input:focus { outline: 2px solid #777; outline-offset: 1px; }
     .text-input:disabled, .date-input:disabled { background: #f5f5f5; color: #777; cursor: not-allowed; }
 
     .req { color: #dc2626; margin-left: 2px; }
     .field-error { border-color: #dc2626 !important; background: #fff8f8 !important; }
-    .field-error:focus { outline-color: rgba(220,38,38,0.4) !important; }
     .sig-error .sig-box { border-color: #dc2626 !important; background: #fff8f8 !important; }
-    .sig-error-msg {
-      font-family: system-ui, sans-serif;
-      font-size: 12.5px;
-      color: #dc2626;
-      margin-top: 4px;
-      display: none;
-    }
+    .sig-error-msg { font-family: system-ui, sans-serif; font-size: 12.5px; color: #dc2626; margin-top: 4px; display: none; }
     .sig-error .sig-error-msg { display: block; }
 
     /* ── Signature canvas ── */
     .sig-container { display: flex; flex-direction: column; gap: 6px; }
-
     .sig-box {
-      position: relative;
-      width: 100%;
-      height: 120px;
-      border: 1px solid #bbb;
-      border-bottom: 2px solid #333;
-      border-radius: 4px 4px 0 0;
-      background: #fdfdfd;
-      overflow: hidden;
+      position: relative; width: 100%; height: 120px;
+      border: 1px solid #bbb; border-bottom: 2px solid #333;
+      border-radius: 4px 4px 0 0; background: #fdfdfd; overflow: hidden;
     }
-
     .sig-box.locked { cursor: not-allowed; background: #f5f5f5; }
-
-    #sig-canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-      touch-action: none;
-      cursor: crosshair;
-    }
-
+    #sig-canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
     .sig-box.locked #sig-canvas { cursor: not-allowed; pointer-events: none; }
-
     .sig-hint {
-      position: absolute;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: #d0d0d0;
-      font-size: 12.5px;
-      font-style: italic;
-      pointer-events: none;
-      user-select: none;
-      white-space: nowrap;
+      position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+      color: #d0d0d0; font-size: 12.5px; font-style: italic;
+      pointer-events: none; user-select: none; white-space: nowrap;
     }
-
     .sig-toolbar { display: flex; justify-content: flex-end; }
-
     .btn-clear {
-      padding: 3px 18px;
-      font-size: 13px;
+      padding: 3px 18px; font-size: 13px;
       font-family: "Times New Roman", Times, serif;
-      color: #555;
-      background: transparent;
-      border: 1px solid #bbb;
-      border-radius: 4px;
-      cursor: pointer;
+      color: #555; background: transparent; border: 1px solid #bbb; border-radius: 4px; cursor: pointer;
     }
     .btn-clear:hover:not(:disabled) { background: #f0f0f0; border-color: #888; }
     .btn-clear:disabled { opacity: 0.4; cursor: not-allowed; }
 
     /* ── Save button ── */
     .btn-save {
-      margin-top: 22px;
-      padding: 11px 38px;
-      font-size: 15.5px;
+      margin-top: 22px; padding: 11px 38px; font-size: 15.5px;
       font-family: "Times New Roman", Times, serif;
-      background: #1a1a1a;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      display: block;
+      background: #1a1a1a; color: #fff; border: none; border-radius: 5px;
+      cursor: pointer; display: block;
     }
     .btn-save:hover:not(:disabled) { background: #333; }
     .btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* ── Thank-you modal ── */
+    /* ── Modal ── */
     .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9000; opacity: 0; pointer-events: none; transition: opacity 0.25s;
     }
     .modal-overlay.open { opacity: 1; pointer-events: auto; }
     .modal-box {
-      background: #fff;
-      border-radius: 12px;
-      padding: 44px 48px;
-      max-width: 520px;
-      width: 92%;
-      text-align: center;
+      background: #fff; border-radius: 12px; padding: 44px 48px;
+      max-width: 520px; width: 92%; text-align: center;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      transform: translateY(16px);
-      transition: transform 0.25s;
+      transform: translateY(16px); transition: transform 0.25s;
       font-family: system-ui, sans-serif;
     }
     .modal-overlay.open .modal-box { transform: translateY(0); }
     .modal-check {
-      width: 68px; height: 68px;
-      border-radius: 50%;
-      background: #dcfce7;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 20px;
-      font-size: 34px;
-      color: #15803d;
+      width: 68px; height: 68px; border-radius: 50%;
+      background: #dcfce7; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; font-size: 34px; color: #15803d;
     }
     .modal-box h2 { font-size: 22px; font-weight: 700; color: #0f172a; margin: 0 0 10px; }
     .modal-box p  { font-size: 15px; color: #475569; line-height: 1.6; margin: 0 0 28px; }
-    .modal-close {
-      background: #0f172a; color: #fff; border: none; border-radius: 6px;
-      padding: 11px 36px; font-size: 15px; font-family: system-ui, sans-serif;
-      font-weight: 500; cursor: pointer;
-    }
-    .modal-close:hover { background: #1e293b; }
 
     /* ── Toast ── */
     .toast {
-      position: fixed;
-      bottom: 28px; right: 28px;
-      background: #1a1a1a;
-      color: #fff;
-      padding: 11px 22px;
-      border-radius: 6px;
-      font-family: system-ui, sans-serif;
-      font-size: 14px;
-      opacity: 0;
-      transition: opacity 0.3s;
-      pointer-events: none;
-      z-index: 9999;
+      position: fixed; bottom: 28px; right: 28px;
+      background: #1a1a1a; color: #fff; padding: 10px 20px;
+      border-radius: 6px; font-family: system-ui, sans-serif; font-size: 13.5px;
+      opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 9999;
+      max-width: 340px;
     }
     .toast.show { opacity: 1; }
 
-    /* ── Other comments ── */
+    /* ── Comments ── */
     .comments-section { margin-top: 30px; }
     .comments-section h2 { font-size: 17px; margin: 0 0 12px; font-weight: bold; text-transform: uppercase; }
     .textarea-input {
-      width: 100%;
-      min-height: 100px;
-      border: 1px solid #aaa;
-      border-radius: 5px;
-      padding: 8px 12px;
-      font-family: "Times New Roman", Times, serif;
-      font-size: 15.5px;
-      color: #111;
-      background: #fff;
-      resize: vertical;
+      width: 100%; min-height: 100px;
+      border: 1px solid #aaa; border-radius: 5px; padding: 8px 12px;
+      font-family: "Times New Roman", Times, serif; font-size: 15.5px; color: #111; background: #fff; resize: vertical;
     }
     .textarea-input:focus { outline: 2px solid #777; outline-offset: 1px; }
     .textarea-input:disabled { background: #f5f5f5; color: #777; cursor: not-allowed; }
-
-    /* ── Section page break ── */
-    .section-break { page-break-before: always; }
 
     /* ── Print ── */
     @media print {
       body { background: #fff; }
       .admin-bar, .btn-save, .btn-clear, .toast { display: none; }
       .page {
-        width: 210mm; max-width: 210mm;
-        margin: 0;
-        padding: 22mm 18mm 18mm;
-        box-shadow: none;
-        page-break-after: always;
+        width: 210mm; max-width: 210mm; margin: 0;
+        padding: 22mm 18mm 18mm; box-shadow: none; page-break-after: always;
       }
       .page:last-child { page-break-after: auto; }
       .sig-box { height: 80px; }
+      .ans-text { border: none; padding: 0; resize: none; min-height: auto; }
     }
   </style>
 </head>
@@ -342,8 +260,10 @@
 </div>
 
 {{ ""|json_script:"__prev_sig__" }}
+{{ is_editable|json_script:"__is_editable__" }}
+{{ has_submission|json_script:"__has_submission__" }}
 
-<!-- ═══════════ PAGE 1: Header + First Section ═══════════ -->
+<!-- ═══════════ PAGE 1 — Header + First Section ═══════════ -->
 <section class="page">
   <div class="header">
     <h1 style="text-align:center;">
@@ -360,20 +280,19 @@
        Memo System, Dashboard, User Profile, and Documentation</p>
   </div>
 
-  {% for section in sections %}
-  {% if forloop.first %}
+  {% for section in sections %}{% if forloop.first %}
   <h2>{{ section.title }}</h2>
   <table>
     <colgroup>
       <col class="c-no"><col class="c-module"><col class="c-correction">
-      <col class="c-action"><col class="c-tick">
+      <col class="c-action"><col class="c-resp">
     </colgroup>
     <thead>
       <tr>
         <th>No.</th><th>Module / Section</th>
         <th>Correction Given by ICT Director</th>
         <th>Required System Update / Action</th>
-        <th>Tick if Correction is Done</th>
+        <th>Response</th>
       </tr>
     </thead>
     <tbody>
@@ -383,34 +302,31 @@
         <td>{{ item.module }}</td>
         <td>{{ item.correction }}</td>
         <td>{{ item.action }}</td>
-        <td><input type="checkbox" class="checkbox" data-id="{{ item.id }}"
-          {% if item.id in done_set %}checked{% endif %}></td>
+        <td>{% include "report/_answer_cell.html" %}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
-  {% endif %}
-  {% endfor %}
+  {% endif %}{% endfor %}
 
   <div class="footer">Page 1 of {{ sections|length|add:"1" }}</div>
 </section>
 
-<!-- ═══════════ MIDDLE PAGES: Remaining Sections ═══════════ -->
-{% for section in sections %}
-{% if not forloop.first %}
+<!-- ═══════════ MIDDLE PAGES — Remaining Sections ═══════════ -->
+{% for section in sections %}{% if not forloop.first %}
 <section class="page">
   <h2>{{ section.title }}</h2>
   <table>
     <colgroup>
       <col class="c-no"><col class="c-module"><col class="c-correction">
-      <col class="c-action"><col class="c-tick">
+      <col class="c-action"><col class="c-resp">
     </colgroup>
     <thead>
       <tr>
         <th>No.</th><th>Module / Section</th>
         <th>Correction Given by ICT Director</th>
         <th>Required System Update / Action</th>
-        <th>Tick if Correction is Done</th>
+        <th>Response</th>
       </tr>
     </thead>
     <tbody>
@@ -420,28 +336,22 @@
         <td>{{ item.module }}</td>
         <td>{{ item.correction }}</td>
         <td>{{ item.action }}</td>
-        <td><input type="checkbox" class="checkbox" data-id="{{ item.id }}"
-          {% if item.id in done_set %}checked{% endif %}></td>
+        <td>{% include "report/_answer_cell.html" %}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
   <div class="footer">Page {{ forloop.counter|add:"1" }} of {{ sections|length|add:"1" }}</div>
 </section>
-{% endif %}
-{% endfor %}
+{% endif %}{% endfor %}
 
-<!-- ═══════════ LAST PAGE: Comments + Signature ═══════════ -->
+<!-- ═══════════ LAST PAGE — Comments + Signature ═══════════ -->
 <section class="page">
-
-  <!-- ── Other Comments ── -->
   <div class="comments-section">
     <h2>Other Comments <span style="font-weight:normal;font-size:14px;text-transform:none;">(Optional)</span></h2>
-    <textarea id="other-comments" class="textarea-input"
-      placeholder="Add any additional comments here…"></textarea>
+    <textarea id="other-comments" class="textarea-input" placeholder="Add any additional comments here…"></textarea>
   </div>
 
-  <!-- ── Confirmation + Digital Signature ── -->
   <div class="signature-section">
     <h2>{{ sections|length|add:"1" }}.0 ICT Director Confirmation and Signature</h2>
     <p class="intro">
@@ -449,7 +359,6 @@
       ticked in the table have been duly completed.
     </p>
 
-    <!-- Name -->
     <div class="field-row">
       <span class="field-label">NAME OF ICT DIRECTOR:<span class="req">*</span></span>
       <div class="field-control">
@@ -457,7 +366,6 @@
       </div>
     </div>
 
-    <!-- Digital signature -->
     <div class="field-row">
       <span class="field-label">SIGNATURE:<span class="req">*</span></span>
       <div class="field-control">
@@ -466,7 +374,7 @@
             <canvas id="sig-canvas"></canvas>
             <span class="sig-hint" id="sig-hint">Draw your signature here</span>
           </div>
-          <p class="sig-error-msg" id="sig-error-msg">Signature is required — please draw your signature.</p>
+          <p class="sig-error-msg" id="sig-error-msg">Signature is required.</p>
           <div class="sig-toolbar">
             <button class="btn-clear" id="btn-clear" type="button" onclick="clearSig()">Clear</button>
           </div>
@@ -474,7 +382,6 @@
       </div>
     </div>
 
-    <!-- Date -->
     <div class="field-row">
       <span class="field-label">DATE:<span class="req">*</span></span>
       <div class="field-control">
@@ -490,15 +397,13 @@
   <div class="footer">Page {{ sections|length|add:"1" }} of {{ sections|length|add:"1" }}</div>
 </section>
 
-<!-- Thank-you modal -->
-<div class="modal-overlay" id="thank-you-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+<div class="modal-overlay" id="thank-you-modal" role="dialog" aria-modal="true">
   <div class="modal-box">
     <div class="modal-check">&#10003;</div>
-    <h2 id="modal-title">Thank You, Director!</h2>
+    <h2>Thank You, Director!</h2>
     <p>
       Your confirmation and signature have been successfully recorded.<br>
-      The Metascholar Consult Ltd team has been notified and will
-      process your response promptly.
+      The Metascholar Consult Ltd team has been notified.
     </p>
     <p style="margin-top:14px;font-size:13px;color:#94a3b8;">Redirecting you now…</p>
   </div>
@@ -507,16 +412,18 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const IS_EDITABLE    = {{ is_editable|yesno:"true,false" }};
-const HAS_SUBMISSION = {{ has_submission|yesno:"true,false" }};
+const IS_EDITABLE    = JSON.parse(document.getElementById('__is_editable__').textContent);
+const HAS_SUBMISSION = JSON.parse(document.getElementById('__has_submission__').textContent);
 const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
+/* ── Utilities ── */
 function showToast(msg, err) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.style.background = err ? '#7f1d1d' : '#1a1a1a';
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.classList.remove('show'), 2600);
 }
 
 function postJSON(url, body) {
@@ -527,6 +434,15 @@ function postJSON(url, body) {
   }).then(r => r.json());
 }
 
+/* ── Save indicator on an element ── */
+function pulseDot(dot, success) {
+  dot.classList.remove('saving', 'saved');
+  void dot.offsetWidth;
+  dot.classList.add(success ? 'saved' : 'saving');
+  if (success) setTimeout(() => dot.classList.remove('saved'), 2000);
+}
+
+/* ── Thank-you modal ── */
 function showThankYou() {
   document.getElementById('thank-you-modal').classList.add('open');
   setTimeout(() => { window.location.href = '/thanks/'; }, 2500);
@@ -551,15 +467,75 @@ function lockForm() {
   if (el) el.addEventListener('input', () => el.classList.remove('field-error'));
 });
 
-/* ── Checkbox persistence ── */
+/* ══════════════════════════════════════════════════════════
+   ANSWER PERSISTENCE
+   Each answer type has its own save path.
+   ══════════════════════════════════════════════════════════ */
+
+/* 1. Checkbox (is_done) */
 document.querySelectorAll('.checkbox').forEach(box => {
   box.addEventListener('change', () => {
+    const dot = box.closest('td').querySelector('.saving-dot');
+    if (dot) { dot.classList.remove('saved'); dot.classList.add('saving'); }
     postJSON('/api/update-correction/', { correction_id: box.dataset.id, is_done: box.checked })
       .then(d => {
-        if (d.success) showToast(box.checked ? 'Marked as done.' : 'Unmarked.');
-        else showToast('Error: ' + (d.error || '?'), true);
+        if (d.success) {
+          showToast(box.checked ? 'Marked as done.' : 'Unmarked.');
+          if (dot) pulseDot(dot, true);
+        } else {
+          showToast('Error: ' + (d.error || '?'), true);
+          box.checked = !box.checked; // revert
+          if (dot) dot.classList.remove('saving');
+        }
+      })
+      .catch(() => { showToast('Network error.', true); box.checked = !box.checked; });
+  });
+});
+
+/* 2. Radio buttons (yes_no / true_false) */
+document.querySelectorAll('.radio-ans').forEach(radio => {
+  radio.addEventListener('change', () => {
+    const group = radio.closest('.radio-group');
+    const dot   = group.querySelector('.saving-dot');
+    if (dot) { dot.classList.remove('saved'); dot.classList.add('saving'); }
+    postJSON('/api/save-answer/', { correction_id: group.dataset.id, answer_value: radio.value })
+      .then(d => {
+        if (d.success) {
+          showToast('Answer saved.');
+          if (dot) pulseDot(dot, true);
+        } else {
+          showToast('Error: ' + (d.error || '?'), true);
+          radio.checked = false;
+          if (dot) dot.classList.remove('saving');
+        }
+      })
+      .catch(() => { showToast('Network error.', true); radio.checked = false; });
+  });
+});
+
+/* 3. Text inputs — save on blur, also debounce on input */
+document.querySelectorAll('.ans-text').forEach(inp => {
+  let _timer = null;
+  const dot  = inp.closest('td') && inp.closest('td').querySelector('.saving-dot');
+
+  const persist = () => {
+    if (dot) { dot.classList.remove('saved'); dot.classList.add('saving'); }
+    postJSON('/api/save-answer/', { correction_id: inp.dataset.id, answer_value: inp.value.trim() })
+      .then(d => {
+        if (d.success) {
+          if (dot) pulseDot(dot, true);
+        } else {
+          showToast('Save failed: ' + (d.error || '?'), true);
+          if (dot) dot.classList.remove('saving');
+        }
       })
       .catch(() => showToast('Network error.', true));
+  };
+
+  inp.addEventListener('blur', persist);
+  inp.addEventListener('input', () => {
+    clearTimeout(_timer);
+    _timer = setTimeout(persist, 1800); // auto-save after 1.8 s idle
   });
 });
 
@@ -587,21 +563,16 @@ window.addEventListener('load', function () {
     const s = e.changedTouches ? e.changedTouches[0] : e;
     return { x: s.clientX - r.left, y: s.clientY - r.top, t: Date.now() };
   }
-
   function spd(a, b) { return Math.hypot(b.x - a.x, b.y - a.y) / (b.t - a.t || 1); }
   function rad(v)     { return Math.max(MIN_R, Math.min(MAX_R, MAX_R - v * 0.38)); }
-
   function dot(x, y, r) {
     ctx.beginPath();
     ctx.arc(x, y, Math.max(0.1, r), 0, Math.PI * 2);
-    ctx.fillStyle = INK;
-    ctx.fill();
+    ctx.fillStyle = INK; ctx.fill();
   }
-
   function stroke(a, b) {
-    const v   = spd(a, b);
-    const sv  = VF * v + (1 - VF) * lastV;
-    lastV     = sv;
+    const v = spd(a, b), sv = VF * v + (1 - VF) * lastV;
+    lastV = sv;
     const rEnd = rad(sv);
     const dist = Math.hypot(b.x - a.x, b.y - a.y);
     const steps = Math.max(1, Math.ceil(dist * 2));
@@ -622,15 +593,11 @@ window.addEventListener('load', function () {
     if (sc) sc.classList.remove('sig-error');
     dot(lastPt.x, lastPt.y, lastR);
   }
-
   function onMove(e) {
     if (!drawing || window.__sigLocked) return;
     e.preventDefault();
-    const p = pos(e);
-    stroke(lastPt, p);
-    lastPt = p;
+    const p = pos(e); stroke(lastPt, p); lastPt = p;
   }
-
   function onUp() { drawing = false; }
 
   canvas.addEventListener('mousedown',  onDown);
@@ -654,7 +621,7 @@ window.addEventListener('load', function () {
   };
 });
 
-/* ── Save / Update confirmation ── */
+/* ── Save confirmation ── */
 function saveConfirmation() {
   const nameEl     = document.getElementById('director-name');
   const dateEl     = document.getElementById('conf-date');
@@ -670,54 +637,38 @@ function saveConfirmation() {
   if (sigBox) sigBox.classList.remove('sig-error');
 
   const errors = [];
-  if (!name) {
-    errors.push('Name of ICT Director is required.');
-    nameEl.classList.add('field-error');
-    nameEl.focus();
-  }
-  if (!sigData) {
-    errors.push('Signature is required — please draw your signature in the box.');
-    if (sigBox) sigBox.classList.add('sig-error');
-  }
-  if (!date) {
-    errors.push('Date is required.');
-    dateEl.classList.add('field-error');
-  }
+  if (!name) { errors.push('Name of ICT Director is required.'); nameEl.classList.add('field-error'); nameEl.focus(); }
+  if (!sigData) { errors.push('Signature is required.'); if (sigBox) sigBox.classList.add('sig-error'); }
+  if (!date) { errors.push('Date is required.'); dateEl.classList.add('field-error'); }
 
-  if (errors.length > 0) { showToast(errors[0], true); return; }
+  if (errors.length) { showToast(errors[0], true); return; }
 
   const saveBtn = document.getElementById('btn-save');
   saveBtn.disabled = true;
   saveBtn.textContent = 'Saving…';
 
   postJSON('/api/save-confirmation/', {
-    director_name:  name,
-    signature_date: date,
-    signature_data: sigData,
-    other_comments: comments,
+    director_name: name, signature_date: date,
+    signature_data: sigData, other_comments: comments,
   })
     .then(d => {
       if (d.success) {
         showThankYou();
       } else if (d.error === 'name_exists') {
-        showToast('A confirmation under this name has already been permanently recorded.', true);
-        saveBtn.disabled = false;
-        saveBtn.textContent = 'Save Confirmation';
+        showToast('A confirmation under this name is already permanently recorded.', true);
+        saveBtn.disabled = false; saveBtn.textContent = 'Save Confirmation';
       } else if (d.error === 'name_required') {
         showToast('Please enter the name of the ICT Director.', true);
         nameEl.classList.add('field-error'); nameEl.focus();
-        saveBtn.disabled = false;
-        saveBtn.textContent = 'Save Confirmation';
+        saveBtn.disabled = false; saveBtn.textContent = 'Save Confirmation';
       } else {
         showToast('Error: ' + (d.error || '?'), true);
-        saveBtn.disabled = false;
-        saveBtn.textContent = 'Save Confirmation';
+        saveBtn.disabled = false; saveBtn.textContent = 'Save Confirmation';
       }
     })
     .catch(() => {
       showToast('Network error.', true);
-      saveBtn.disabled = false;
-      saveBtn.textContent = 'Save Confirmation';
+      saveBtn.disabled = false; saveBtn.textContent = 'Save Confirmation';
     });
 }
 </script>
