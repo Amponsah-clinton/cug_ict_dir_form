@@ -224,9 +224,6 @@
   <div class="panel">
     <div class="panel-header">
       <h2>Submission Records</h2>
-      <button class="btn btn-danger" id="btn-reset" onclick="resetCheckboxes()" title="Uncheck all correction boxes on the report form">
-        &#8635; Reset All Checkboxes
-      </button>
     </div>
 
     {% if submissions %}
@@ -283,33 +280,6 @@
 
 <script>
 const CSRF = '{{ csrf_token }}';
-
-function resetCheckboxes() {
-  if (!confirm('This will uncheck ALL correction boxes on the report form. Are you sure?')) return;
-  const btn = document.getElementById('btn-reset');
-  btn.disabled = true;
-  btn.textContent = 'Resetting…';
-
-  fetch('/admin/reset-corrections/', {
-    method: 'POST',
-    headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json' },
-  })
-    .then(r => r.json())
-    .then(d => {
-      if (d.success) {
-        alert('All checkboxes have been reset to unchecked.');
-      } else {
-        alert('Reset failed: ' + (d.error || 'Unknown error'));
-      }
-      btn.disabled = false;
-      btn.innerHTML = '&#8635; Reset All Checkboxes';
-    })
-    .catch(() => {
-      alert('Network error — could not reset.');
-      btn.disabled = false;
-      btn.innerHTML = '&#8635; Reset All Checkboxes';
-    });
-}
 
 function deleteSubmission(id, btn) {
   if (!confirm('Delete this submission? This cannot be undone.')) return;

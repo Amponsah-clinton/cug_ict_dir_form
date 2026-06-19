@@ -94,8 +94,7 @@ def _send_notification(director_name, signature_date, submission_id):
 def report_view(request):
     client = get_client()
 
-    result = client.table('cug_corrections').select('correction_id, is_done').execute()
-    done_set = {r['correction_id'] for r in (result.data or []) if r['is_done']}
+    done_set = set()  # always start unchecked; name guard prevents duplicate submission
 
     try:
         conf_result = (
@@ -284,18 +283,6 @@ def delete_submission(request, submission_id):
         verify = svc.table('cug_director_confirmation').select('id').eq('id', submission_id).execute()
         if verify.data:
             return JsonResponse({'error': 'Delete did not complete — check Supabase RLS policies.'}, status=500)
-        return JsonResponse({'success': True})
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-
-
-# ── API: reset all correction checkboxes ─────────────────────────────────────
-
-@require_http_methods(['POST'])
-def reset_corrections(request):
-    try:
-        svc = get_service_client()
-        svc.table('cug_corrections').update({'is_done': False}).neq('id', 0).execute()
         return JsonResponse({'success': True})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
