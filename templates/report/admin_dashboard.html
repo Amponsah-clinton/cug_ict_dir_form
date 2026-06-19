@@ -142,14 +142,16 @@
       text-decoration: none;
       border: 1px solid transparent;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: background 0.15s, opacity 0.15s;
+      white-space: nowrap;
     }
     .btn-outline { border-color: var(--border); background: #fff; color: var(--text); }
     .btn-outline:hover { background: var(--grey); }
-    .btn-dark { background: var(--navy); color: #fff; }
+    .btn-dark { background: var(--navy); color: #fff; border-color: var(--navy); }
     .btn-dark:hover { background: #1e293b; }
-    .btn-danger { background: #fff; color: var(--red); border-color: #fca5a5; }
-    .btn-danger:hover { background: #fee2e2; }
+    .btn-danger { background: var(--red); color: #fff; border-color: var(--red); }
+    .btn-danger:hover { background: #991b1b; border-color: #991b1b; }
+    .btn-danger:disabled { opacity: 0.55; cursor: not-allowed; }
 
     /* ── Empty state ─────────────────────────────────────── */
     .empty { padding: 60px 24px; text-align: center; color: var(--muted); }

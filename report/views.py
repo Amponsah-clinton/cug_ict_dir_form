@@ -127,7 +127,6 @@ def report_view(request):
         'done_set': done_set,
         'confirmation': confirmation,
         'is_editable': is_editable,
-        'seconds_remaining': seconds_remaining,
         'has_submission': bool(confirmation),
     }
     return render(request, 'report/index.html', context)
