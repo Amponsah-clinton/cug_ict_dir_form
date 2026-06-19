@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Archival Corrections Report — Print</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #e8e8e8;
+      font-family: "Times New Roman", Times, serif;
+      color: #111;
+      line-height: 1.2;
+    }
+
+    /* ── Print button bar (hidden on print) ── */
+    .print-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: #1a1a1a;
+      color: #fff;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 999;
+      font-family: system-ui, sans-serif;
+      font-size: 14px;
+    }
+    .print-bar-left { display: flex; align-items: center; gap: 16px; }
+    .print-bar a  { color: #93c5fd; text-decoration: none; font-size: 13px; }
+    .print-bar a:hover { text-decoration: underline; }
+
+    .btn-print {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 22px;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: system-ui, sans-serif;
+    }
+    .btn-print:hover { background: #1d4ed8; }
+
+    /* ── Pages ─────────────────────────────────────────────── */
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 80px auto 30px;  /* 80px top = clear the fixed print-bar */
+      padding: 20mm 18mm 18mm;
+      background: #fff;
+      position: relative;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.2);
+    }
+
+    .header { margin-bottom: 14px; }
+    .header h1 {
+      font-size: 17px;
+      line-height: 1.1;
+      margin: 0;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .meta { font-size: 14.5px; margin: 16px 0 20px; }
+    .meta p { margin: 0 0 2px; }
+
+    h2 {
+      font-size: 15px;
+      margin: 18px 0 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 13.5px;
+    }
+
+    th, td {
+      border: 1px solid #777;
+      padding: 5px 7px;
+      vertical-align: top;
+    }
+
+    th { text-align: left; font-weight: bold; }
+
+    col.c-no         { width: 5%; }
+    col.c-module      { width: 14%; }
+    col.c-correction  { width: 30%; }
+    col.c-action      { width: 31%; }
+    col.c-tick        { width: 20%; }
+
+    td:first-child { text-align: center; font-style: italic; }
+
+    /* ── Checkboxes ────────────────────────────────── */
+    .tick-cell { text-align: center; }
+    .tick-done {
+      display: inline-block;
+      width: 15px; height: 15px;
+      border: 1.5px solid #333;
+      background: #111;
+      position: relative;
+    }
+    .tick-done::after {
+      content: '✓';
+      position: absolute;
+      top: -3px; left: 1px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: bold;
+    }
+    .tick-empty {
+      display: inline-block;
+      width: 15px; height: 15px;
+      border: 1.5px solid #999;
+    }
+
+    /* ── Footer ──────────────────────────────────────── */
+    .footer {
+      position: absolute;
+      bottom: 10mm;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 13px;
+      color: #666;
+    }
+
+    /* ── Signature section ───────────────────────────── */
+    .sig-section { margin-top: 22px; }
+    .sig-section > .intro { font-size: 14.5px; font-style: italic; margin: 0 0 18px; line-height: 1.5; }
+
+    .field-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 14px 0;
+      font-size: 15px;
+    }
+
+    .field-label { min-width: 190px; font-weight: normal; padding-top: 4px; white-space: nowrap; }
+
+    .field-value {
+      flex: 1;
+      border-bottom: 1px solid #333;
+      min-height: 22px;
+      padding-bottom: 2px;
+      font-size: 15px;
+    }
+
+    .sig-img-wrap {
+      flex: 1;
+      border: 1px solid #aaa;
+      border-bottom: 2px solid #333;
+      border-radius: 3px 3px 0 0;
+      background: #fafafa;
+      padding: 4px;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+    }
+
+    .sig-img {
+      max-width: 100%;
+      max-height: 65px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .sig-none-text { color: #bbb; font-style: italic; font-size: 13px; }
+
+    /* ── Stamp ─────────────────────────────────────────── */
+    .stamp {
+      display: inline-block;
+      border: 2px solid #15803d;
+      border-radius: 4px;
+      color: #15803d;
+      padding: 4px 14px;
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 10px;
+    }
+
+    /* ── Print overrides ─────────────────────────────── */
+    @media print {
+      body { background: #fff; }
+      .print-bar { display: none; }
+      .page {
+        margin: 0;
+        box-shadow: none;
+        page-break-after: always;
+      }
+      .page:last-child { page-break-after: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Fixed print toolbar (hidden on print) -->
+<div class="print-bar">
+  <div class="print-bar-left">
+    <span>&#128196; Archival Corrections Report</span>
+    <a href="/admin/">← Back to Dashboard</a>
+  </div>
+  <button class="btn-print" onclick="window.print()">&#128424; Save as PDF / Print</button>
+</div>
+
+{% with s1=sections.0 s2=sections.1 %}
+
+<!-- ══════════════ PAGE 1 ══════════════ -->
+<section class="page">
+  <div class="header">
+    <h1>
+      METASCHOLAR CONSULT LTD<br>
+      ARCHIVAL SYSTEM CORRECTIONS REPORT<br>
+      FOR THE ICT DIRECTOR, CATHOLIC UNIVERSITY OF GHANA
+    </h1>
+  </div>
+
+  <div class="meta">
+    <p><strong>Prepared For:</strong> ICT Director, Catholic University of Ghana</p>
+    <p><strong>Prepared By:</strong> Metascholar Consult Ltd</p>
+    <p><strong>System Area:</strong> Archival System, File Deposit, Exams File Deposit, Folder Access,
+       Memo System, Dashboard, User Profile, and Documentation</p>
+    <p style="margin-top:6px"><strong>Report Generated:</strong> {{ submitted_at }}</p>
+  </div>
+
+  <h2>{{ s1.title }}</h2>
+  <table>
+    <colgroup>
+      <col class="c-no"><col class="c-module"><col class="c-correction">
+      <col class="c-action"><col class="c-tick">
+    </colgroup>
+    <thead>
+      <tr>
+        <th>No.</th><th>Module / Section</th>
+        <th>Correction Given by ICT Director</th>
+        <th>Required System Update / Action</th>
+        <th>Tick if Done</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in s1.items %}{% if item.num <= 9 %}
+      <tr>
+        <td>{{ item.num }}</td>
+        <td>{{ item.module }}</td>
+        <td>{{ item.correction }}</td>
+        <td>{{ item.action }}</td>
+        <td class="tick-cell">
+          {% if item.id in done_set %}<span class="tick-done"></span>{% else %}<span class="tick-empty"></span>{% endif %}
+        </td>
+      </tr>
+      {% endif %}{% endfor %}
+    </tbody>
+  </table>
+
+  <div class="footer">Page 1 of 3 &nbsp;·&nbsp; {{ done_count }} of {{ total }} corrections completed</div>
+</section>
+
+<!-- ══════════════ PAGE 2 ══════════════ -->
+<section class="page">
+  <table>
+    <colgroup>
+      <col class="c-no"><col class="c-module"><col class="c-correction">
+      <col class="c-action"><col class="c-tick">
+    </colgroup>
+    <tbody>
+      {% for item in s1.items %}{% if item.num >= 10 %}
+      <tr>
+        <td>{{ item.num }}</td>
+        <td>{{ item.module }}</td>
+        <td>{{ item.correction }}</td>
+        <td>{{ item.action }}</td>
+        <td class="tick-cell">
+          {% if item.id in done_set %}<span class="tick-done"></span>{% else %}<span class="tick-empty"></span>{% endif %}
+        </td>
+      </tr>
+      {% endif %}{% endfor %}
+    </tbody>
+  </table>
+
+  <h2>{{ s2.title }}</h2>
+  <table>
+    <colgroup>
+      <col class="c-no"><col class="c-module"><col class="c-correction">
+      <col class="c-action"><col class="c-tick">
+    </colgroup>
+    <thead>
+      <tr>
+        <th>No.</th><th>Module / Section</th>
+        <th>Correction Given by ICT Director</th>
+        <th>Required System Update / Action</th>
+        <th>Tick if Done</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in s2.items %}{% if item.num <= 5 %}
+      <tr>
+        <td>{{ item.num }}</td>
+        <td>{{ item.module }}</td>
+        <td>{{ item.correction }}</td>
+        <td>{{ item.action }}</td>
+        <td class="tick-cell">
+          {% if item.id in done_set %}<span class="tick-done"></span>{% else %}<span class="tick-empty"></span>{% endif %}
+        </td>
+      </tr>
+      {% endif %}{% endfor %}
+    </tbody>
+  </table>
+
+  <div class="footer">Page 2 of 3 &nbsp;·&nbsp; {{ done_count }} of {{ total }} corrections completed</div>
+</section>
+
+<!-- ══════════════ PAGE 3 ══════════════ -->
+<section class="page">
+  <table>
+    <colgroup>
+      <col class="c-no"><col class="c-module"><col class="c-correction">
+      <col class="c-action"><col class="c-tick">
+    </colgroup>
+    <tbody>
+      {% for item in s2.items %}{% if item.num >= 6 %}
+      <tr>
+        <td>{{ item.num }}</td>
+        <td>{{ item.module }}</td>
+        <td>{{ item.correction }}</td>
+        <td>{{ item.action }}</td>
+        <td class="tick-cell">
+          {% if item.id in done_set %}<span class="tick-done"></span>{% else %}<span class="tick-empty"></span>{% endif %}
+        </td>
+      </tr>
+      {% endif %}{% endfor %}
+    </tbody>
+  </table>
+
+  <!-- ── Confirmation with real rendered signature ── -->
+  <div class="sig-section">
+    <h2>3.0 ICT Director Confirmation and Signature</h2>
+    <p class="intro">
+      I hereby confirm that the corrections listed above have been reviewed and that the items
+      ticked in the table have been duly completed.
+    </p>
+
+    <div class="field-row">
+      <span class="field-label">NAME OF ICT DIRECTOR:</span>
+      <div class="field-value">{{ confirmation.director_name|default:"" }}</div>
+    </div>
+
+    <div class="field-row">
+      <span class="field-label">SIGNATURE:</span>
+      <div class="sig-img-wrap">
+        {% if confirmation.signature_data %}
+          <img src="{{ confirmation.signature_data }}" alt="Signature" class="sig-img" />
+        {% else %}
+          <span class="sig-none-text">No signature recorded</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="field-row">
+      <span class="field-label">DATE:</span>
+      <div class="field-value">{{ confirmation.signature_date|default:"" }}</div>
+    </div>
+
+    {% if confirmation.director_name or confirmation.signature_data %}
+    <div class="stamp">&#10003; Confirmed &amp; Signed</div>
+    {% endif %}
+  </div>
+
+  <div class="footer">Page 3 of 3 &nbsp;·&nbsp; Submitted {{ submitted_at }}</div>
+</section>
+
+{% endwith %}
+</body>
+</html>

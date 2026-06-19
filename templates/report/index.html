@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Archival System Corrections Report</title>
+  <meta name="csrf-token" content="{{ csrf_token }}" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #d0d0d0;
+      font-family: "Times New Roman", Times, serif;
+      color: #111;
+      line-height: 1.2;
+    }
+
+    /* ── Top admin link bar ──────────────────────────────── */
+    .admin-bar {
+      background: #0f172a;
+      color: #94a3b8;
+      font-family: system-ui, sans-serif;
+      font-size: 13px;
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .admin-bar a {
+      color: #93c5fd;
+      text-decoration: none;
+      padding: 4px 12px;
+      border: 1px solid #334155;
+      border-radius: 4px;
+      transition: background 0.15s;
+    }
+    .admin-bar a:hover { background: #1e293b; color: #fff; }
+
+    /* ══════════════════════════════════════════════════════
+       PAGE — 1140 px on screen, 210 mm when printing
+    ══════════════════════════════════════════════════════ */
+    .page {
+      width: 1140px;
+      max-width: 98vw;
+      min-height: 297mm;
+      margin: 28px auto;
+      padding: 50px 64px 60px;
+      background: #fff;
+      position: relative;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.22);
+    }
+
+    /* ── Header ──────────────────────────────────────────── */
+    .header { margin-bottom: 18px; }
+    .header h1 {
+      font-size: 21px;
+      line-height: 1.15;
+      margin: 0;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .meta { font-size: 16px; margin: 20px 0 28px; }
+    .meta p { margin: 0 0 3px; }
+
+    h2 {
+      font-size: 17px;
+      margin: 24px 0 14px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    /* ── Table ───────────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 15px;
+    }
+
+    th, td {
+      border: 1px solid #777;
+      padding: 7px 10px;
+      vertical-align: top;
+    }
+
+    th { text-align: left; font-weight: bold; background: #fafafa; }
+
+    col.c-no         { width: 5%; }
+    col.c-module      { width: 14%; }
+    col.c-correction  { width: 31%; }
+    col.c-action      { width: 31%; }
+    col.c-tick        { width: 19%; }
+
+    td:first-child { text-align: center; font-style: italic; }
+
+    .checkbox {
+      width: 15px; height: 15px;
+      cursor: pointer;
+      accent-color: #111;
+      margin-top: 1px;
+    }
+    .checkbox:disabled { cursor: not-allowed; opacity: 0.5; }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .footer {
+      position: absolute;
+      bottom: 14mm;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 15px;
+      color: #666;
+    }
+
+    /* ── Signature section ───────────────────────────────── */
+    .signature-section { margin-top: 30px; }
+    .signature-section > .intro {
+      font-size: 16px;
+      font-style: italic;
+      margin: 0 0 28px;
+      line-height: 1.5;
+    }
+
+    .field-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      margin: 22px 0;
+      font-size: 16px;
+    }
+
+    .field-label {
+      white-space: nowrap;
+      padding-top: 7px;
+      min-width: 230px;
+    }
+
+    .field-control { flex: 1; }
+
+    .text-input,
+    .date-input {
+      width: 100%;
+      height: 40px;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+      padding: 5px 12px;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 15.5px;
+      color: #111;
+      background: #fff;
+    }
+
+    .text-input:focus, .date-input:focus { outline: 2px solid #777; outline-offset: 1px; }
+    .text-input:disabled, .date-input:disabled { background: #f5f5f5; color: #777; cursor: not-allowed; }
+
+    /* Required field indicators & error states */
+    .req { color: #dc2626; margin-left: 2px; }
+    .field-error { border-color: #dc2626 !important; background: #fff8f8 !important; }
+    .field-error:focus { outline-color: rgba(220,38,38,0.4) !important; }
+    .sig-error .sig-box { border-color: #dc2626 !important; background: #fff8f8 !important; }
+    .sig-error-msg {
+      font-family: system-ui, sans-serif;
+      font-size: 12.5px;
+      color: #dc2626;
+      margin-top: 4px;
+      display: none;
+    }
+    .sig-error .sig-error-msg { display: block; }
+
+    /* ── Signature canvas area ───────────────────────────── */
+    .sig-container { display: flex; flex-direction: column; gap: 6px; }
+
+    .sig-box {
+      position: relative;
+      width: 100%;
+      height: 120px;
+      border: 1px solid #bbb;
+      border-bottom: 2px solid #333;
+      border-radius: 4px 4px 0 0;
+      background: #fdfdfd;
+      overflow: hidden;
+    }
+
+    .sig-box.locked {
+      cursor: not-allowed;
+      background: #f5f5f5;
+    }
+
+    #sig-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    .sig-box.locked #sig-canvas { cursor: not-allowed; pointer-events: none; }
+
+    .sig-hint {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #d0d0d0;
+      font-size: 12.5px;
+      font-style: italic;
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .sig-toolbar { display: flex; justify-content: flex-end; }
+
+    .btn-clear {
+      padding: 3px 18px;
+      font-size: 13px;
+      font-family: "Times New Roman", Times, serif;
+      color: #555;
+      background: transparent;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-clear:hover:not(:disabled) { background: #f0f0f0; border-color: #888; }
+    .btn-clear:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── Lock / countdown banner ─────────────────────────── */
+    .lock-banner {
+      font-family: system-ui, sans-serif;
+      font-size: 13.5px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .lock-banner.editable  { background: #fefce8; border: 1px solid #fde047; color: #713f12; }
+    .lock-banner.locked    { background: #fee2e2; border: 1px solid #fca5a5; color: #7f1d1d; }
+    .lock-banner .icon     { font-size: 16px; }
+    .lock-banner strong    { font-weight: 700; }
+    .lock-banner #countdown{ font-variant-numeric: tabular-nums; font-weight: 700; }
+
+    /* ── Save button ─────────────────────────────────────── */
+    .btn-save {
+      margin-top: 22px;
+      padding: 11px 38px;
+      font-size: 15.5px;
+      font-family: "Times New Roman", Times, serif;
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: block;
+    }
+    .btn-save:hover:not(:disabled) { background: #333; }
+    .btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── Toast ───────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      background: #1a1a1a;
+      color: #fff;
+      padding: 11px 22px;
+      border-radius: 6px;
+      font-family: system-ui, sans-serif;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    .toast.show { opacity: 1; }
+
+    /* ── Print ───────────────────────────────────────────── */
+    @media print {
+      body { background: #fff; }
+      .admin-bar, .btn-save, .btn-clear, .lock-banner, .toast { display: none; }
+      .page {
+        width: 210mm; max-width: 210mm;
+        margin: 0;
+        padding: 22mm 18mm 18mm;
+        box-shadow: none;
+        page-break-after: always;
+      }
+      .page:last-child { page-break-after: auto; }
+      .sig-box { height: 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Admin bar -->
+<div class="admin-bar">
+  <span>CUG Archival System &nbsp;&mdash;&nbsp; ICT Director Report</span>
+  <a href="/admin/">&#128196; Admin Dashboard</a>
+</div>
+
+{# Pass signature data safely via json_script #}
+{{ confirmation.signature_data|default:""|json_script:"__prev_sig__" }}
+
+{% with s1=sections.0 s2=sections.1 %}
+
+<!-- ═══════════════ PAGE 1 ═══════════════ -->
+<section class="page">
+  <div class="header">
+    <h1>
+      METASCHOLAR CONSULT LTD<br>
+      ARCHIVAL SYSTEM CORRECTIONS REPORT<br>
+      FOR THE ICT DIRECTOR, CATHOLIC UNIVERSITY OF GHANA
+    </h1>
+  </div>
+
+  <div class="meta">
+    <p><strong>Prepared For:</strong> ICT Director, Catholic University of Ghana</p>
+    <p><strong>Prepared By:</strong> Metascholar Consult Ltd</p>
+    <p><strong>System Area:</strong> Archival System, File Deposit, Exams File Deposit, Folder Access,
+       Memo System, Dashboard, User Profile, and Documentation</p>
+  </div>
+
+  <h2>{{ s1.title }}</h2>
+
+  <table>
+    <colgroup>
+      <col class="c-no"><col class="c-module"><col class="c-correction">
+      <col class="c-action"><col class="c-tick">
+    </colgroup>
+    <thead>
+      <tr>
+        <th>No.</th><th>Module / Section</th>
+        <th>Correction Given by ICT Director</th>
+        <th>Required System Update / Action</th>
+        <th>Tick if Correction is Done</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in s1.items %}{% if item.num <= 9 %}
+      <tr>
+        <td>{{ item.num }}</td>
+        <td>{{ item.module }}</td>
+        <td>{{ item.correction }}</td>
+        <td>{{ item.action }}</td>
+        <td><input type="checkbox" class="checkbox" data-id="{{ item.id }}" {% if item.id in done_set %}checked{% endif %}></td>
+      </tr>
+      {% endif %}{% endfor %}
+    </tbody>
+  </table>
+
+  <div class="footer">Page 1 of 3</div>
+</section>
+
+<!-- ═══════════════ PAGE 2 ═══════════════ -->
+<section class="page">
+  <table>
+    <colgroup>
+      <col class="c-no"><col class="c-module"><col class="c-correction">
+      <col class="c-action"><col class="c-tick">
+    </colgroup>
+    <tbody>
+      {% for item in s1.items %}{% if item.num >= 10 %}
+      <tr>
+        <td>{{ item.num }}</td>
+        <td>{{ item.module }}</td>
+        <td>{{ item.correction }}</td>
+        <td>{{ item.action }}</td>
+        <td><input type="checkbox" class="checkbox" data-id="{{ item.id }}" {% if item.id in done_set %}checked{% endif %}></td>
+      </tr>
+      {% endif %}{% endfor %}
+    </tbody>
+  </table>
+
+  <h2>{{ s2.title }}</h2>
+
+  <table>
+    <colgroup>
+      <col class="c-no"><col class="c-module"><col class="c-correction">
+      <col class="c-action"><col class="c-tick">
+    </colgroup>
+    <thead>
+      <tr>
+        <th>No.</th><th>Module / Section</th>
+        <th>Correction Given by ICT Director</th>
+        <th>Required System Update / Action</th>
+        <th>Tick if Correction is Done</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in s2.items %}{% if item.num <= 5 %}
+      <tr>
+        <td>{{ item.num }}</td>
+        <td>{{ item.module }}</td>
+        <td>{{ item.correction }}</td>
+        <td>{{ item.action }}</td>
+        <td><input type="checkbox" class="checkbox" data-id="{{ item.id }}" {% if item.id in done_set %}checked{% endif %}></td>
+      </tr>
+      {% endif %}{% endfor %}
+    </tbody>
+  </table>
+
+  <div class="footer">Page 2 of 3</div>
+</section>
+
+<!-- ═══════════════ PAGE 3 ═══════════════ -->
+<section class="page">
+  <table>
+    <colgroup>
+      <col class="c-no"><col class="c-module"><col class="c-correction">
+      <col class="c-action"><col class="c-tick">
+    </colgroup>
+    <tbody>
+      {% for item in s2.items %}{% if item.num >= 6 %}
+      <tr>
+        <td>{{ item.num }}</td>
+        <td>{{ item.module }}</td>
+        <td>{{ item.correction }}</td>
+        <td>{{ item.action }}</td>
+        <td><input type="checkbox" class="checkbox" data-id="{{ item.id }}" {% if item.id in done_set %}checked{% endif %}></td>
+      </tr>
+      {% endif %}{% endfor %}
+    </tbody>
+  </table>
+
+  <!-- ── Confirmation + Digital Signature ── -->
+  <div class="signature-section">
+    <h2>3.0 ICT Director Confirmation and Signature</h2>
+    <p class="intro">
+      I hereby confirm that the corrections listed above have been reviewed and that the items
+      ticked in the table have been duly completed.
+    </p>
+
+    <!-- Lock / countdown notice -->
+    {% if has_submission %}
+      {% if is_editable %}
+        <div class="lock-banner editable">
+          <span class="icon">&#9203;</span>
+          <span>
+            You can still edit this form.
+            It will lock in <strong><span id="countdown">{{ seconds_remaining }}s</span></strong>.
+          </span>
+        </div>
+      {% else %}
+        <div class="lock-banner locked">
+          <span class="icon">&#128274;</span>
+          <span><strong>Form locked.</strong> The 10-minute edit window has expired. This submission is now read-only.</span>
+        </div>
+      {% endif %}
+    {% endif %}
+
+    <!-- Name -->
+    <div class="field-row">
+      <span class="field-label">NAME OF ICT DIRECTOR:</span>
+      <div class="field-control">
+        <input type="text" id="director-name" class="text-input"
+          value="{{ confirmation.director_name|default:'' }}"
+          placeholder="Enter full name"
+          {% if has_submission and not is_editable %}disabled{% endif %} />
+      </div>
+    </div>
+
+    <!-- Digital signature -->
+    <div class="field-row">
+      <span class="field-label">SIGNATURE:</span>
+      <div class="field-control">
+        <div class="sig-container">
+          <div class="sig-box {% if has_submission and not is_editable %}locked{% endif %}" id="sig-box">
+            <canvas id="sig-canvas"></canvas>
+            <span class="sig-hint" id="sig-hint">Draw your signature here</span>
+          </div>
+          <div class="sig-toolbar">
+            <button class="btn-clear" id="btn-clear" type="button" onclick="clearSig()"
+              {% if has_submission and not is_editable %}disabled{% endif %}>
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Date -->
+    <div class="field-row">
+      <span class="field-label">DATE:</span>
+      <div class="field-control">
+        <input type="date" id="conf-date" class="date-input"
+          value="{{ confirmation.signature_date|default:'' }}"
+          {% if has_submission and not is_editable %}disabled{% endif %} />
+      </div>
+    </div>
+
+    <button class="btn-save" id="btn-save" type="button" onclick="saveConfirmation()"
+      {% if has_submission and not is_editable %}disabled{% endif %}>
+      {% if has_submission %}Update Confirmation{% else %}Save Confirmation{% endif %}
+    </button>
+  </div>
+
+  <div class="footer">Page 3 of 3</div>
+</section>
+
+{% endwith %}
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── Config injected from Django ── */
+const IS_EDITABLE    = {{ is_editable|yesno:"true,false" }};
+const HAS_SUBMISSION = {{ has_submission|yesno:"true,false" }};
+let   SECS_LEFT      = {{ seconds_remaining }};
+const CSRF = document.querySelector('meta[name="csrf-token"]').content;
+
+/* ── Utilities ──────────────────────────────────────────── */
+function showToast(msg, err) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = err ? '#7f1d1d' : '#1a1a1a';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function postJSON(url, body) {
+  return fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+    body: JSON.stringify(body),
+  }).then(r => r.json());
+}
+
+function fmt(s) {
+  const m = Math.floor(s / 60), sec = s % 60;
+  return m > 0
+    ? `${m}m ${String(sec).padStart(2, '0')}s`
+    : `${sec}s`;
+}
+
+/* ── Countdown ──────────────────────────────────────────── */
+if (IS_EDITABLE && HAS_SUBMISSION && SECS_LEFT > 0) {
+  const cdEl = document.getElementById('countdown');
+  const iv = setInterval(() => {
+    SECS_LEFT--;
+    if (cdEl) cdEl.textContent = fmt(SECS_LEFT);
+    if (SECS_LEFT <= 0) {
+      clearInterval(iv);
+      lockForm();
+    }
+  }, 1000);
+}
+
+function lockForm() {
+  const banner = document.querySelector('.lock-banner');
+  if (banner) {
+    banner.className = 'lock-banner locked';
+    banner.innerHTML = '<span class="icon">&#128274;</span><span><strong>Form locked.</strong> The 10-minute edit window has expired.</span>';
+  }
+  ['director-name', 'conf-date'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = true;
+  });
+  const saveBtn  = document.getElementById('btn-save');
+  const clearBtn = document.getElementById('btn-clear');
+  const sigBox   = document.getElementById('sig-box');
+  if (saveBtn)  { saveBtn.disabled = true; }
+  if (clearBtn) { clearBtn.disabled = true; }
+  if (sigBox)   { sigBox.classList.add('locked'); }
+  window.__sigLocked = true;
+}
+
+/* ── Checkbox persistence ───────────────────────────────── */
+document.querySelectorAll('.checkbox').forEach(box => {
+  box.addEventListener('change', () => {
+    postJSON('/api/update-correction/', { correction_id: box.dataset.id, is_done: box.checked })
+      .then(d => {
+        if (d.success) showToast(box.checked ? 'Marked as done.' : 'Unmarked.');
+        else showToast('Error: ' + (d.error || '?'), true);
+      })
+      .catch(() => showToast('Network error.', true));
+  });
+});
+
+/* ── Signature pad ──────────────────────────────────────── */
+window.addEventListener('load', function () {
+  const canvas = document.getElementById('sig-canvas');
+  const hint   = document.getElementById('sig-hint');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const CW  = canvas.offsetWidth;
+  const CH  = canvas.offsetHeight;
+
+  canvas.width  = CW * dpr;
+  canvas.height = CH * dpr;
+  ctx.scale(dpr, dpr);
+
+  /* Pen physics */
+  const MIN_R = 0.22, MAX_R = 0.90, VF = 0.60;
+  const INK   = 'rgba(5, 5, 22, 0.88)';
+  let drawing = false, lastPt = null, lastV = 0, lastR = (MIN_R + MAX_R) / 2;
+
+  function pos(e) {
+    const r = canvas.getBoundingClientRect();
+    const s = e.changedTouches ? e.changedTouches[0] : e;
+    return { x: s.clientX - r.left, y: s.clientY - r.top, t: Date.now() };
+  }
+
+  function spd(a, b) {
+    return Math.hypot(b.x - a.x, b.y - a.y) / (b.t - a.t || 1);
+  }
+
+  function rad(v) { return Math.max(MIN_R, Math.min(MAX_R, MAX_R - v * 0.38)); }
+
+  function dot(x, y, r) {
+    ctx.beginPath();
+    ctx.arc(x, y, Math.max(0.1, r), 0, Math.PI * 2);
+    ctx.fillStyle = INK;
+    ctx.fill();
+  }
+
+  function stroke(a, b) {
+    const v   = spd(a, b);
+    const sv  = VF * v + (1 - VF) * lastV;
+    lastV     = sv;
+    const rEnd = rad(sv);
+    const dist = Math.hypot(b.x - a.x, b.y - a.y);
+    const steps = Math.max(1, Math.ceil(dist * 2));
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps;
+      dot(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, lastR + (rEnd - lastR) * t);
+    }
+    lastR = rEnd;
+  }
+
+  function onDown(e) {
+    if (window.__sigLocked) return;
+    e.preventDefault();
+    drawing = true;
+    lastPt = pos(e); lastV = 0; lastR = (MIN_R + MAX_R) / 2;
+    if (hint) hint.style.display = 'none';
+    dot(lastPt.x, lastPt.y, lastR);
+  }
+
+  function onMove(e) {
+    if (!drawing || window.__sigLocked) return;
+    e.preventDefault();
+    const p = pos(e);
+    stroke(lastPt, p);
+    lastPt = p;
+  }
+
+  function onUp() { drawing = false; }
+
+  canvas.addEventListener('mousedown',  onDown);
+  canvas.addEventListener('mousemove',  onMove);
+  canvas.addEventListener('mouseup',    onUp);
+  canvas.addEventListener('mouseleave', onUp);
+  canvas.addEventListener('touchstart', onDown, { passive: false });
+  canvas.addEventListener('touchmove',  onMove,  { passive: false });
+  canvas.addEventListener('touchend',   onUp);
+
+  window.clearSig = function () {
+    if (window.__sigLocked) return;
+    ctx.clearRect(0, 0, CW, CH);
+    lastPt = null;
+    if (hint) hint.style.display = '';
+  };
+
+  window.getSigData = function () {
+    const px = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    return px.some(v => v > 0) ? canvas.toDataURL('image/png') : '';
+  };
+
+  /* Pre-load saved signature */
+  try {
+    const saved = JSON.parse(document.getElementById('__prev_sig__').textContent);
+    if (saved) {
+      const img = new Image();
+      img.onload = () => { ctx.drawImage(img, 0, 0, CW, CH); if (hint) hint.style.display = 'none'; };
+      img.src = saved;
+    }
+  } catch (_) {}
+
+  /* If locked from the start, set flag */
+  if (HAS_SUBMISSION && !IS_EDITABLE) window.__sigLocked = true;
+});
+
+/* ── Save / Update confirmation ─────────────────────────── */
+function saveConfirmation() {
+  const name    = document.getElementById('director-name').value.trim();
+  const date    = document.getElementById('conf-date').value;
+  const sigData = window.getSigData ? window.getSigData() : '';
+  const saveBtn = document.getElementById('btn-save');
+
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving…';
+
+  postJSON('/api/save-confirmation/', {
+    director_name:  name,
+    signature_date: date,
+    signature_data: sigData,
+  })
+    .then(d => {
+      if (d.success) {
+        showToast(d.updated ? 'Confirmation updated.' : 'Confirmation saved. Email sent.');
+        saveBtn.textContent = 'Update Confirmation';
+        saveBtn.disabled = false;
+      } else if (d.error === 'locked') {
+        showToast('Form is locked — edit window expired.', true);
+        lockForm();
+      } else {
+        showToast('Error: ' + (d.error || '?'), true);
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Confirmation';
+      }
+    })
+    .catch(() => {
+      showToast('Network error.', true);
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save Confirmation';
+    });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — CUG Archival Corrections</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:  #0f172a;
+      --blue:  #1e40af;
+      --green: #15803d;
+      --amber: #b45309;
+      --red:   #b91c1c;
+      --grey:  #f1f5f9;
+      --border:#e2e8f0;
+      --text:  #1e293b;
+      --muted: #64748b;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Top bar ──────────────────────────────────────────── */
+    .topbar {
+      background: var(--navy);
+      color: #fff;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .topbar-brand { font-size: 16px; font-weight: 600; letter-spacing: 0.3px; }
+    .topbar-brand span { color: #93c5fd; }
+
+    .topbar-nav { display: flex; gap: 16px; align-items: center; }
+    .topbar-nav a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 13.5px;
+      padding: 6px 14px;
+      border-radius: 5px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .topbar-nav a:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .topbar-nav .btn-primary {
+      background: var(--blue);
+      color: #fff;
+    }
+    .topbar-nav .btn-primary:hover { background: #1d4ed8; }
+
+    /* ── Page layout ─────────────────────────────────────── */
+    .page { max-width: 1280px; margin: 0 auto; padding: 36px 32px 60px; }
+
+    .page-header { margin-bottom: 32px; }
+    .page-header h1 { font-size: 24px; font-weight: 700; color: var(--navy); }
+    .page-header p  { color: var(--muted); margin-top: 4px; font-size: 14px; }
+
+    /* ── Stat cards ──────────────────────────────────────── */
+    .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-bottom: 36px; }
+
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .card-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); }
+    .card-value { font-size: 32px; font-weight: 700; margin: 6px 0 2px; color: var(--navy); }
+    .card-sub   { font-size: 13px; color: var(--muted); }
+
+    .card.green .card-value { color: var(--green); }
+    .card.amber .card-value { color: var(--amber); }
+    .card.blue  .card-value { color: var(--blue);  }
+
+    /* ── Progress bar ────────────────────────────────────── */
+    .progress-wrap { margin-bottom: 36px; background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .progress-wrap h3 { font-size: 14px; font-weight: 600; margin-bottom: 14px; color: var(--navy); }
+    .progress-bar-bg { background: #e2e8f0; border-radius: 999px; height: 12px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #16a34a, #22c55e); transition: width 0.6s; }
+    .progress-label { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+    /* ── Table panel ─────────────────────────────────────── */
+    .panel { background: #fff; border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+    .panel-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .panel-header h2 { font-size: 16px; font-weight: 600; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead th { background: var(--grey); padding: 12px 16px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); }
+    tbody td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #f8fafc; }
+
+    /* ── Badges ──────────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-green { background: #dcfce7; color: #15803d; }
+    .badge-amber { background: #fef3c7; color: #b45309; }
+    .badge-red   { background: #fee2e2; color: #b91c1c; }
+
+    /* ── Sig thumbnail ───────────────────────────────────── */
+    .sig-thumb {
+      width: 120px;
+      height: 40px;
+      object-fit: contain;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: #fdfdfd;
+    }
+    .sig-none { color: var(--muted); font-style: italic; font-size: 13px; }
+
+    /* ── Action buttons ──────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 14px;
+      border-radius: 5px;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-outline { border-color: var(--border); background: #fff; color: var(--text); }
+    .btn-outline:hover { background: var(--grey); }
+    .btn-dark { background: var(--navy); color: #fff; }
+    .btn-dark:hover { background: #1e293b; }
+    .btn-danger { background: #fff; color: var(--red); border-color: #fca5a5; }
+    .btn-danger:hover { background: #fee2e2; }
+
+    /* ── Empty state ─────────────────────────────────────── */
+    .empty { padding: 60px 24px; text-align: center; color: var(--muted); }
+    .empty-icon { font-size: 48px; margin-bottom: 12px; }
+    .empty h3   { font-size: 18px; font-weight: 600; color: var(--navy); margin-bottom: 6px; }
+
+    /* ── Countdown timer (inline) ────────────────────────── */
+    .countdown { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+    @media (max-width: 768px) {
+      .page { padding: 20px 16px 40px; }
+      .topbar { padding: 0 16px; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      table { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-brand">
+    CUG Archival System &nbsp;/&nbsp; <span>Admin Dashboard</span>
+  </div>
+  <nav class="topbar-nav">
+    <a href="/">View Form</a>
+    <a href="/" class="btn-primary">Go to Report Form</a>
+  </nav>
+</header>
+
+<main class="page">
+  <div class="page-header">
+    <h1>Corrections Report — Dashboard</h1>
+    <p>Metascholar Consult Ltd &nbsp;·&nbsp; Catholic University of Ghana &nbsp;·&nbsp; ICT Director Confirmations</p>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="stats">
+    <div class="card blue">
+      <div class="card-label">Total Submissions</div>
+      <div class="card-value">{{ submissions|length }}</div>
+      <div class="card-sub">Director confirmations recorded</div>
+    </div>
+    <div class="card green">
+      <div class="card-label">Corrections Done</div>
+      <div class="card-value">{{ done_count }}</div>
+      <div class="card-sub">out of {{ total }} total items</div>
+    </div>
+    <div class="card {% if pct == 100 %}green{% elif pct >= 50 %}amber{% else %}{% endif %}">
+      <div class="card-label">Completion Rate</div>
+      <div class="card-value">{{ pct }}%</div>
+      <div class="card-sub">Corrections marked as done</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Remaining</div>
+      <div class="card-value">{{ total|add:done_count|add:"-50"|add:"25" }}</div>
+      <div class="card-sub">Corrections still pending</div>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="progress-wrap">
+    <h3>Overall Correction Progress</h3>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" style="width: {{ pct }}%"></div>
+    </div>
+    <p class="progress-label">{{ done_count }} of {{ total }} corrections completed ({{ pct }}%)</p>
+  </div>
+
+  <!-- Submissions table -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Submission Records</h2>
+    </div>
+
+    {% if submissions %}
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Director Name</th>
+          <th>Signed Date</th>
+          <th>Signature</th>
+          <th>Submitted At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sub in submissions %}
+        <tr id="row-{{ sub.id }}">
+          <td style="color:var(--muted);font-size:13px">{{ forloop.counter }}</td>
+          <td><strong>{{ sub.director_name|default:"—" }}</strong></td>
+          <td>{{ sub.signature_date|default:"—" }}</td>
+          <td>
+            {% if sub.signature_data %}
+              <img src="{{ sub.signature_data }}" alt="Signature" class="sig-thumb" />
+            {% else %}
+              <span class="sig-none">No signature</span>
+            {% endif %}
+          </td>
+          <td style="white-space:nowrap;color:var(--muted);font-size:13px">{{ sub.created_at_display }}</td>
+          <td>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <a href="/admin/print/{{ sub.id }}/" class="btn btn-dark" target="_blank">
+                &#128196; View / Print
+              </a>
+              <button class="btn btn-danger" onclick="deleteSubmission({{ sub.id }}, this)">
+                &#128465; Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty">
+      <div class="empty-icon">&#128196;</div>
+      <h3>No submissions yet</h3>
+      <p>When the ICT Director fills and saves the form, it will appear here.</p>
+      <br>
+      <a href="/" class="btn btn-dark">Go to Report Form</a>
+    </div>
+    {% endif %}
+  </div>
+</main>
+
+<script>
+const CSRF = '{{ csrf_token }}';
+
+function deleteSubmission(id, btn) {
+  if (!confirm('Delete this submission? This cannot be undone.')) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Deleting…';
+
+  fetch(`/admin/delete/${id}/`, {
+    method: 'POST',
+    headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json' },
+  })
+    .then(r => r.json())
+    .then(d => {
+      if (d.success) {
+        const row = document.getElementById(`row-${id}`);
+        if (row) {
+          row.style.transition = 'opacity 0.3s';
+          row.style.opacity = '0';
+          setTimeout(() => row.remove(), 320);
+        }
+      } else {
+        alert('Delete failed: ' + (d.error || 'Unknown error'));
+        btn.disabled = false;
+        btn.textContent = '🗑 Delete';
+      }
+    })
+    .catch(() => {
+      alert('Network error — could not delete.');
+      btn.disabled = false;
+      btn.innerHTML = '&#128465; Delete';
+    });
+}
+</script>
+</body>
+</html>
