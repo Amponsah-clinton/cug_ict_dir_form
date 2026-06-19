@@ -359,8 +359,8 @@
 <body>
 
 
-{# Pass signature data safely via json_script #}
-{{ confirmation.signature_data|default:""|json_script:"__prev_sig__" }}
+{# Signature always starts blank so each visitor gets a fresh form #}
+{{ ""|json_script:"__prev_sig__" }}
 
 {% with s1=sections.0 s2=sections.1 %}
 
@@ -487,8 +487,7 @@
   <div class="comments-section">
     <h2>Other Comments <span style="font-weight:normal;font-size:14px;text-transform:none;">(Optional)</span></h2>
     <textarea id="other-comments" class="textarea-input"
-      placeholder="Add any additional comments here…"
-      {% if has_submission and not is_editable %}disabled{% endif %}>{{ confirmation.other_comments|default:'' }}</textarea>
+      placeholder="Add any additional comments here…"></textarea>
   </div>
 
   <!-- ── Confirmation + Digital Signature ── -->
@@ -504,9 +503,7 @@
       <span class="field-label">NAME OF ICT DIRECTOR:<span class="req">*</span></span>
       <div class="field-control">
         <input type="text" id="director-name" class="text-input"
-          value="{{ confirmation.director_name|default:'' }}"
-          placeholder="Enter full name"
-          {% if has_submission and not is_editable %}disabled{% endif %} />
+          placeholder="Enter full name" />
       </div>
     </div>
 
@@ -515,14 +512,13 @@
       <span class="field-label">SIGNATURE:<span class="req">*</span></span>
       <div class="field-control">
         <div class="sig-container">
-          <div class="sig-box {% if has_submission and not is_editable %}locked{% endif %}" id="sig-box">
+          <div class="sig-box" id="sig-box">
             <canvas id="sig-canvas"></canvas>
             <span class="sig-hint" id="sig-hint">Draw your signature here</span>
           </div>
           <p class="sig-error-msg" id="sig-error-msg">Signature is required — please draw your signature.</p>
           <div class="sig-toolbar">
-            <button class="btn-clear" id="btn-clear" type="button" onclick="clearSig()"
-              {% if has_submission and not is_editable %}disabled{% endif %}>
+            <button class="btn-clear" id="btn-clear" type="button" onclick="clearSig()">
               Clear
             </button>
           </div>
@@ -534,15 +530,12 @@
     <div class="field-row">
       <span class="field-label">DATE:<span class="req">*</span></span>
       <div class="field-control">
-        <input type="date" id="conf-date" class="date-input"
-          value="{{ confirmation.signature_date|default:'' }}"
-          {% if has_submission and not is_editable %}disabled{% endif %} />
+        <input type="date" id="conf-date" class="date-input" />
       </div>
     </div>
 
-    <button class="btn-save" id="btn-save" type="button" onclick="saveConfirmation()"
-      {% if has_submission and not is_editable %}disabled{% endif %}>
-      Save Confirmation
+    <button class="btn-save" id="btn-save" type="button" onclick="saveConfirmation()">
+      {% if has_submission %}Update Confirmation{% else %}Save Confirmation{% endif %}
     </button>
   </div>
 
@@ -723,18 +716,7 @@ window.addEventListener('load', function () {
     return px.some(v => v > 0) ? canvas.toDataURL('image/png') : '';
   };
 
-  /* Pre-load saved signature */
-  try {
-    const saved = JSON.parse(document.getElementById('__prev_sig__').textContent);
-    if (saved) {
-      const img = new Image();
-      img.onload = () => { ctx.drawImage(img, 0, 0, CW, CH); if (hint) hint.style.display = 'none'; };
-      img.src = saved;
-    }
-  } catch (_) {}
-
-  /* If locked from the start, set flag */
-  if (HAS_SUBMISSION && !IS_EDITABLE) window.__sigLocked = true;
+  /* Signature always starts blank — no pre-load */
 });
 
 /* ── Save / Update confirmation ─────────────────────────── */
