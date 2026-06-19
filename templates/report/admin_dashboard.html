@@ -198,17 +198,6 @@
     /* ── Response column ── */
     .resp-cell { display: flex; flex-direction: column; gap: 3px; }
 
-    .done-toggle {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 5px 11px; border-radius: 6px; border: none;
-      font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
-      transition: background 0.12s, color 0.12s;
-    }
-    .done-toggle.is-done  { background: #dcfce7; color: #15803d; }
-    .done-toggle.not-done { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
-    .done-toggle.is-done:hover  { background: #bbf7d0; }
-    .done-toggle.not-done:hover { background: #e2e8f0; }
-
     .resp-pill {
       display: inline-flex; align-items: center; gap: 4px;
       padding: 4px 10px; border-radius: 6px;
@@ -646,9 +635,8 @@ function renderRespView(item) {
   const typeTag = `<span class="resp-type-tag">${answerTypeLabel(atype)}</span>`;
 
   if (atype === 'checkbox') {
-    const cls = item.is_done ? 'is-done' : 'not-done';
-    const lbl = item.is_done ? '&#10003; Done' : '&#9675; Pending';
-    return `<button class="done-toggle ${cls}" onclick="toggleDone(${item.id}, this, '${item.correction_id}')">${lbl}</button>`;
+    return `<input type="checkbox" class="done-check" ${item.is_done ? 'checked' : ''}
+      onchange="toggleDone(${item.id}, this, '${item.correction_id}')">`;
   }
 
   const v = (item.answer_value || '').trim().toLowerCase();
@@ -676,18 +664,15 @@ function renderRespView(item) {
 function renderItemRow(item, sec, ii) {
   const atype = item.answer_type || 'checkbox';
 
-  // Edit mode: type dropdown + is_done checkbox
+  // Edit mode: type dropdown only
   const sel = (v) => atype === v ? ' selected' : '';
   const editContent = `
-    <select class="cell-edit cell-input type-select" data-field="answer_type" style="width:100%;margin-bottom:5px">
+    <select class="cell-edit cell-input type-select" data-field="answer_type" style="width:100%">
       <option value="checkbox"${sel('checkbox')}>Checkbox</option>
       <option value="yes_no"${sel('yes_no')}>Yes / No</option>
       <option value="true_false"${sel('true_false')}>True / False</option>
       <option value="text"${sel('text')}>Text</option>
-    </select>
-    <label class="cell-edit" style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px;cursor:pointer">
-      <input type="checkbox" class="done-check" data-field="is_done"${item.is_done ? ' checked' : ''}> Done
-    </label>`;
+    </select>`;
 
   return `
   <tr id="row-item-${item.id}">
@@ -816,7 +801,6 @@ function saveRow(itemId, sectionKey, correctionId) {
             if (inputs.correction !== undefined) item.correction  = inputs.correction;
             if (inputs.action     !== undefined) item.action      = inputs.action;
             if (inputs.answer_type!== undefined) item.answer_type = inputs.answer_type;
-            if (inputs.is_done    !== undefined) item.is_done     = inputs.is_done;
           }
         }
         renderSections();
@@ -829,11 +813,8 @@ function saveRow(itemId, sectionKey, correctionId) {
 
 // ── Toggle done ───────────────────────────────────────────────────────────────
 
-function toggleDone(itemId, el, correctionId) {
-  // el is either a checkbox input or a .done-toggle button
-  const isChk = el.type === 'checkbox';
-  const val = isChk ? el.checked : el.classList.contains('not-done');
-
+function toggleDone(itemId, checkbox, correctionId) {
+  const val = checkbox.checked;
   Promise.all([
     post(`/admin/api/corrections/${itemId}/update/`, { is_done: val }),
     post('/api/update-correction/', { correction_id: correctionId, is_done: val }),
@@ -844,15 +825,11 @@ function toggleDone(itemId, el, correctionId) {
         const item = sec.items.find(i => i.id === itemId);
         if (item) item.is_done = val;
       }
-      if (!isChk) renderSections();
     } else {
       toast('Failed: ' + (d.error || '?'), true);
-      if (isChk) el.checked = !val;
+      checkbox.checked = !val;
     }
-  }).catch(() => {
-    toast('Network error.', true);
-    if (isChk) el.checked = !val;
-  });
+  }).catch(() => { toast('Network error.', true); checkbox.checked = !val; });
 }
 
 // ── Delete item ───────────────────────────────────────────────────────────────
