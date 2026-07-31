@@ -143,7 +143,7 @@
     .signature-section { margin-top: 30px; }
     .intro { font-size: 16px; font-style: italic; margin: 0; line-height: 1.5; }
 
-    /* ── Signee (Technical Arbiter) header with portrait ── */
+    /* ── Signee (Independent Expert / Technical Arbiter) header with portrait ── */
     .signee-header { display: flex; align-items: center; gap: 22px; margin-bottom: 24px; }
     .signee-photo {
       width: 104px; height: 104px; border-radius: 50%;
@@ -177,7 +177,7 @@
     /* ── Signature canvas ── */
     .sig-container { display: flex; flex-direction: column; gap: 6px; }
     .sig-box {
-      position: relative; width: 100%; height: 120px;
+      position: relative; width: 100%; height: 170px;
       border: 1px solid #bbb; border-bottom: 2px solid #333;
       border-radius: 4px 4px 0 0; background: #fdfdfd; overflow: hidden;
     }
@@ -261,7 +261,7 @@
         padding: 22mm 18mm 18mm; box-shadow: none;
       }
       tr { page-break-inside: avoid; }
-      .sig-box { height: 80px; }
+      .sig-box { height: 110px; }
       .ans-text { border: none; padding: 0; resize: none; min-height: auto; }
     }
   </style>
@@ -269,7 +269,7 @@
 <body>
 
 <div class="admin-bar">
-  <span>CUG Archival System — Technical Arbiter Corrections Report</span>
+  <span>CUG Archival System — Independent Expert / Technical Arbiter Corrections Report</span>
   <a href="/admin/">Admin Dashboard</a>
 </div>
 
@@ -299,7 +299,7 @@
   <div class="meta">
     <p><strong>Ref:</strong> {{ meta.ref }} &nbsp;·&nbsp; <strong>Date:</strong> {{ meta.report_date }}</p>
     <p><strong>MDOI Memo Identifier:</strong> <a href="{{ meta.mdoi_url }}" target="_blank" rel="noopener noreferrer">{{ meta.mdoi_url }}</a></p>
-    <p><strong>Prepared For:</strong> Technical Arbiter, Catholic University of Ghana</p>
+    <p><strong>Prepared For:</strong> Independent Expert / Technical Arbiter, Catholic University of Ghana</p>
     <p><strong>Prepared By:</strong> {{ meta.prepared_by }}</p>
     <p><strong>Purpose:</strong> {{ meta.purpose }}</p>
     <p style="font-style:italic;margin-top:8px;">Please review each item below and tick (&#10003;) the checkbox if the portion has been completed, tested, and verified. Sign off at the bottom to confirm system readiness.</p>
@@ -317,9 +317,9 @@
 
   <div class="signature-section">
     <div class="signee-header">
-      <img src="{{ meta.director_photo }}" alt="Technical Arbiter" class="signee-photo" />
+      <img src="{{ meta.director_photo }}" alt="Independent Expert / Technical Arbiter" class="signee-photo" />
       <div class="signee-header-text">
-        <h2>Technical Arbiter Confirmation and Signature</h2>
+        <h2>Independent Expert / Technical Arbiter Confirmation and Signature</h2>
         <p class="intro">
           I hereby confirm that the corrections listed above have been reviewed and that the items
           ticked in the table have been duly completed.
@@ -328,7 +328,7 @@
     </div>
 
     <div class="field-row">
-      <span class="field-label">NAME OF TECHNICAL ARBITER:<span class="req">*</span></span>
+      <span class="field-label">NAME OF INDEPENDENT EXPERT / TECHNICAL ARBITER:<span class="req">*</span></span>
       <div class="field-control">
         <input type="text" id="director-name" class="text-input" value="Selorm Kofi Tagbo" readonly />
       </div>
@@ -366,7 +366,7 @@
 <div class="modal-overlay" id="thank-you-modal" role="dialog" aria-modal="true">
   <div class="modal-box">
     <div class="modal-check">&#10003;</div>
-    <h2>Thank You, Technical Arbiter!</h2>
+    <h2>Thank You, Independent Expert / Technical Arbiter!</h2>
     <p>
       Your confirmation and signature have been successfully recorded.<br>
       The Metascholar Consult Ltd team has been notified.
@@ -603,7 +603,7 @@ function saveConfirmation() {
   if (sigBox) sigBox.classList.remove('sig-error');
 
   const errors = [];
-  if (!name) { errors.push('Name of Technical Arbiter is required.'); nameEl.classList.add('field-error'); nameEl.focus(); }
+  if (!name) { errors.push('Name of Independent Expert / Technical Arbiter is required.'); nameEl.classList.add('field-error'); nameEl.focus(); }
   if (!sigData) { errors.push('Signature is required.'); if (sigBox) sigBox.classList.add('sig-error'); }
   if (!date) { errors.push('Date is required.'); dateEl.classList.add('field-error'); }
 
@@ -624,7 +624,7 @@ function saveConfirmation() {
         showToast('A confirmation under this name is already permanently recorded.', true);
         saveBtn.disabled = false; saveBtn.textContent = 'Save Confirmation';
       } else if (d.error === 'name_required') {
-        showToast('Please enter the name of the Technical Arbiter.', true);
+        showToast('Please enter the name of the Independent Expert / Technical Arbiter.', true);
         nameEl.classList.add('field-error'); nameEl.focus();
         saveBtn.disabled = false; saveBtn.textContent = 'Save Confirmation';
       } else {
