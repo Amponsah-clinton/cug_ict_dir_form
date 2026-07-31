@@ -51,6 +51,7 @@
 
     .header { margin-bottom: 18px; }
     .header h1 { font-size: 21px; line-height: 1.15; margin: 0; font-weight: bold; text-transform: uppercase; }
+    .letterhead { display: block; width: 100%; height: auto; margin: 0 0 22px; }
 
     .meta { font-size: 16px; margin: 20px 0 28px; }
     .meta p { margin: 0 0 3px; }
@@ -268,8 +269,8 @@
 
 <section class="page">
   <div class="header">
+    <img src="{{ meta.letterhead }}" alt="Metascholar Consult Ltd" class="letterhead" />
     <h1 style="text-align:center;">
-      METASCHOLAR CONSULT LTD<br>
       <span style="text-transform:none;">{{ meta.title }}</span><br>
       <span style="text-transform:none;font-weight:normal;font-size:16px;">{{ meta.subtitle }}</span>
     </h1>
