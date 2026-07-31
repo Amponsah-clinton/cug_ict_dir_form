@@ -51,7 +51,17 @@
 
     .header { margin-bottom: 18px; }
     .header h1 { font-size: 21px; line-height: 1.15; margin: 0; font-weight: bold; text-transform: uppercase; }
-    .letterhead { display: block; width: 100%; height: auto; margin: 0 0 22px; }
+
+    /* ── Dual brand header (Metascholar + Catholic University of Ghana) ── */
+    .brand-row { display: flex; align-items: center; justify-content: center; gap: 34px; margin: 0 0 22px; }
+    .brand-block { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .brand-logo { height: 92px; width: auto; object-fit: contain; }
+    .brand-logo.logo-ms { height: 118px; }
+    .brand-name {
+      font-size: 13px; font-weight: bold; letter-spacing: 0.5px;
+      text-transform: uppercase; text-align: center; max-width: 220px;
+    }
+    .brand-divider { width: 1px; height: 100px; background: #bbb; align-self: center; }
 
     .meta { font-size: 16px; margin: 20px 0 28px; }
     .meta p { margin: 0 0 3px; }
@@ -133,7 +143,7 @@
     .signature-section { margin-top: 30px; }
     .intro { font-size: 16px; font-style: italic; margin: 0; line-height: 1.5; }
 
-    /* ── Signee (Director) header with portrait ── */
+    /* ── Signee (Technical Arbiter) header with portrait ── */
     .signee-header { display: flex; align-items: center; gap: 22px; margin-bottom: 24px; }
     .signee-photo {
       width: 104px; height: 104px; border-radius: 50%;
@@ -259,7 +269,7 @@
 <body>
 
 <div class="admin-bar">
-  <span>CUG Archival System — Director Corrections Report</span>
+  <span>CUG Archival System — Technical Arbiter Corrections Report</span>
   <a href="/admin/">Admin Dashboard</a>
 </div>
 
@@ -269,7 +279,17 @@
 
 <section class="page">
   <div class="header">
-    <img src="{{ meta.letterhead }}" alt="Metascholar Consult Ltd" class="letterhead" />
+    <div class="brand-row">
+      <div class="brand-block">
+        <img src="{{ meta.logo_metascholar }}" alt="Metascholar Consult Ltd" class="brand-logo logo-ms" />
+        <span class="brand-name">Metascholar Consult Ltd</span>
+      </div>
+      <div class="brand-divider"></div>
+      <div class="brand-block">
+        <img src="{{ meta.logo_cug }}" alt="Catholic University of Ghana" class="brand-logo" />
+        <span class="brand-name">Catholic University of Ghana</span>
+      </div>
+    </div>
     <h1 style="text-align:center;">
       <span style="text-transform:none;">{{ meta.title }}</span><br>
       <span style="text-transform:none;font-weight:normal;font-size:16px;">{{ meta.subtitle }}</span>
@@ -279,7 +299,7 @@
   <div class="meta">
     <p><strong>Ref:</strong> {{ meta.ref }} &nbsp;·&nbsp; <strong>Date:</strong> {{ meta.report_date }}</p>
     <p><strong>MDOI Memo Identifier:</strong> <a href="{{ meta.mdoi_url }}" target="_blank" rel="noopener noreferrer">{{ meta.mdoi_url }}</a></p>
-    <p><strong>Prepared For:</strong> Director, Catholic University of Ghana</p>
+    <p><strong>Prepared For:</strong> Technical Arbiter, Catholic University of Ghana</p>
     <p><strong>Prepared By:</strong> {{ meta.prepared_by }}</p>
     <p><strong>Purpose:</strong> {{ meta.purpose }}</p>
     <p style="font-style:italic;margin-top:8px;">Please review each item below and tick (&#10003;) the checkbox if the portion has been completed, tested, and verified. Sign off at the bottom to confirm system readiness.</p>
@@ -297,9 +317,9 @@
 
   <div class="signature-section">
     <div class="signee-header">
-      <img src="{{ meta.director_photo }}" alt="Director" class="signee-photo" />
+      <img src="{{ meta.director_photo }}" alt="Technical Arbiter" class="signee-photo" />
       <div class="signee-header-text">
-        <h2>Director Confirmation and Signature</h2>
+        <h2>Technical Arbiter Confirmation and Signature</h2>
         <p class="intro">
           I hereby confirm that the corrections listed above have been reviewed and that the items
           ticked in the table have been duly completed.
@@ -308,7 +328,7 @@
     </div>
 
     <div class="field-row">
-      <span class="field-label">NAME OF DIRECTOR:<span class="req">*</span></span>
+      <span class="field-label">NAME OF TECHNICAL ARBITER:<span class="req">*</span></span>
       <div class="field-control">
         <input type="text" id="director-name" class="text-input" value="Selorm Kofi Tagbo" readonly />
       </div>
@@ -346,7 +366,7 @@
 <div class="modal-overlay" id="thank-you-modal" role="dialog" aria-modal="true">
   <div class="modal-box">
     <div class="modal-check">&#10003;</div>
-    <h2>Thank You, Director!</h2>
+    <h2>Thank You, Technical Arbiter!</h2>
     <p>
       Your confirmation and signature have been successfully recorded.<br>
       The Metascholar Consult Ltd team has been notified.
@@ -583,7 +603,7 @@ function saveConfirmation() {
   if (sigBox) sigBox.classList.remove('sig-error');
 
   const errors = [];
-  if (!name) { errors.push('Name of Director is required.'); nameEl.classList.add('field-error'); nameEl.focus(); }
+  if (!name) { errors.push('Name of Technical Arbiter is required.'); nameEl.classList.add('field-error'); nameEl.focus(); }
   if (!sigData) { errors.push('Signature is required.'); if (sigBox) sigBox.classList.add('sig-error'); }
   if (!date) { errors.push('Date is required.'); dateEl.classList.add('field-error'); }
 
@@ -604,7 +624,7 @@ function saveConfirmation() {
         showToast('A confirmation under this name is already permanently recorded.', true);
         saveBtn.disabled = false; saveBtn.textContent = 'Save Confirmation';
       } else if (d.error === 'name_required') {
-        showToast('Please enter the name of the Director.', true);
+        showToast('Please enter the name of the Technical Arbiter.', true);
         nameEl.classList.add('field-error'); nameEl.focus();
         saveBtn.disabled = false; saveBtn.textContent = 'Save Confirmation';
       } else {
