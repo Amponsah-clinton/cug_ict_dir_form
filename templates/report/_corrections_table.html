@@ -15,9 +15,9 @@
   <tbody>
     {% for item in section.items %}
     <tr>
-      <td>{{ item.num }}</td>
-      {% for col in section.columns %}<td>{{ item|get_item:col.key }}</td>{% endfor %}
-      <td>{% include "report/_answer_cell.html" %}</td>
+      <td data-label="No.">{{ item.num }}</td>
+      {% for col in section.columns %}<td data-label="{{ col.label }}">{{ item|get_item:col.key }}</td>{% endfor %}
+      <td data-label="{{ section.response_label|default:'Response' }}">{% include "report/_answer_cell.html" %}</td>
     </tr>
     {% endfor %}
   </tbody>
