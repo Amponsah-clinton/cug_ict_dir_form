@@ -10,7 +10,7 @@ from django.views.decorators.http import require_http_methods
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from .supabase_client import get_client, get_service_client
-from .corrections_data import SECTIONS
+from .corrections_data import SECTIONS, SECTION_LAYOUT, DEFAULT_COLUMNS, REPORT_META
 
 EDIT_WINDOW = getattr(settings, 'FORM_EDIT_WINDOW', 600)
 NOTIFY = getattr(settings, 'FORM_NOTIFICATION_EMAILS', [])
@@ -57,7 +57,7 @@ def _send_notification(director_name, signature_date, submission_id):
     subject = 'CUG Archival System — Corrections Report Submitted'
     host = os.getenv('SITE_URL', 'http://udtsform.sslip.io')
     text = (
-        f"The ICT Director Confirmation Form has been submitted.\n\n"
+        f"The Director Confirmation Form has been submitted.\n\n"
         f"Director: {director_name or '(not entered)'}\n"
         f"Date:     {signature_date or '(not entered)'}\n\n"
         f"View the admin dashboard: {host}/admin/\n"
@@ -70,7 +70,7 @@ def _send_notification(director_name, signature_date, submission_id):
       <p style="color:#aaa;margin:4px 0 0">Archival Corrections Report — Form Submitted</p>
     </div>
     <div style="background:#f9f9f9;padding:24px 30px;border:1px solid #ddd;border-top:none;border-radius:0 0 6px 6px">
-      <p>The ICT Director Confirmation Form has been filled and saved.</p>
+      <p>The Director Confirmation Form has been filled and saved.</p>
       <table style="border-collapse:collapse;width:100%;margin:16px 0">
         <tr><td style="padding:6px 0;font-weight:bold;width:120px">Director</td>
             <td style="padding:6px 0">{director_name or '<em>not entered</em>'}</td></tr>
@@ -128,10 +128,13 @@ def _fetch_all_corrections_supabase():
         for row in result.data:
             sk = row['section_key']
             if sk not in sections_map:
+                layout = SECTION_LAYOUT.get(sk, {})
                 sections_map[sk] = {
                     'title': row.get('section_title', ''),
                     'section_key': sk,
                     'section_order': row.get('section_order', 0),
+                    'columns': layout.get('columns', DEFAULT_COLUMNS),
+                    'response_label': layout.get('response_label', 'Response'),
                     'items': [],
                 }
                 sections_order.append(sk)
@@ -213,6 +216,7 @@ def report_view(request):
         'is_editable': is_editable,
         'has_submission': bool(confirmation),
         'total': total,
+        'meta': REPORT_META,
     }
     return render(request, 'report/index.html', context)
 
@@ -489,6 +493,7 @@ def print_report(request, submission_id):
         'submitted_at': dt.strftime('%d %B %Y at %H:%M UTC') if dt else '',
         'done_count': len(done_set),
         'total': sum(len(s['items']) for s in sections),
+        'meta': REPORT_META,
     }
     return render(request, 'report/print_report.html', context)
 

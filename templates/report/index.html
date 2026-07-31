@@ -128,16 +128,19 @@
     .saving-dot.saving { background: #f59e0b; }
     .saving-dot.saved  { background: #22c55e; }
 
-    /* ── Footer ── */
-    .footer {
-      position: absolute;
-      bottom: 14mm; left: 0; right: 0;
-      text-align: center; font-size: 15px; color: #666;
-    }
-
     /* ── Signature section ── */
     .signature-section { margin-top: 30px; }
-    .signature-section > .intro { font-size: 16px; font-style: italic; margin: 0 0 28px; line-height: 1.5; }
+    .intro { font-size: 16px; font-style: italic; margin: 0; line-height: 1.5; }
+
+    /* ── Signee (Director) header with portrait ── */
+    .signee-header { display: flex; align-items: center; gap: 22px; margin-bottom: 24px; }
+    .signee-photo {
+      width: 104px; height: 104px; border-radius: 50%;
+      object-fit: cover; flex-shrink: 0; background: #eee;
+      border: 3px solid #1a1a1a; box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+    }
+    .signee-header-text { flex: 1; min-width: 0; }
+    .signee-header-text h2 { margin: 0 0 10px; }
 
     .field-row { display: flex; align-items: flex-start; gap: 18px; margin: 22px 0; font-size: 16px; }
     .field-label { white-space: nowrap; padding-top: 7px; min-width: 230px; }
@@ -152,7 +155,7 @@
       font-size: 15.5px; color: #111; background: #fff;
     }
     .text-input:focus, .date-input:focus { outline: 2px solid #777; outline-offset: 1px; }
-    .text-input:disabled, .date-input:disabled { background: #f5f5f5; color: #777; cursor: not-allowed; }
+    .text-input:disabled, .date-input:disabled, .text-input:read-only { background: #f5f5f5; color: #777; cursor: not-allowed; }
 
     .req { color: #dc2626; margin-left: 2px; }
     .field-error { border-color: #dc2626 !important; background: #fff8f8 !important; }
@@ -244,9 +247,9 @@
       .admin-bar, .btn-save, .btn-clear, .toast { display: none; }
       .page {
         width: 210mm; max-width: 210mm; margin: 0;
-        padding: 22mm 18mm 18mm; box-shadow: none; page-break-after: always;
+        padding: 22mm 18mm 18mm; box-shadow: none;
       }
-      .page:last-child { page-break-after: auto; }
+      tr { page-break-inside: avoid; }
       .sig-box { height: 80px; }
       .ans-text { border: none; padding: 0; resize: none; min-height: auto; }
     }
@@ -255,7 +258,7 @@
 <body>
 
 <div class="admin-bar">
-  <span>CUG Archival System — ICT Director Corrections Report</span>
+  <span>CUG Archival System — Director Corrections Report</span>
   <a href="/admin/">Admin Dashboard</a>
 </div>
 
@@ -263,106 +266,50 @@
 {{ is_editable|json_script:"__is_editable__" }}
 {{ has_submission|json_script:"__has_submission__" }}
 
-<!-- ═══════════ PAGE 1 — Header + First Section ═══════════ -->
 <section class="page">
   <div class="header">
     <h1 style="text-align:center;">
       METASCHOLAR CONSULT LTD<br>
-      <span style="text-transform:none;">University Digital Transformation Suite (UDTS)</span><br>
-      FOR THE ICT DIRECTOR, CATHOLIC UNIVERSITY OF GHANA
+      <span style="text-transform:none;">{{ meta.title }}</span><br>
+      <span style="text-transform:none;font-weight:normal;font-size:16px;">{{ meta.subtitle }}</span>
     </h1>
   </div>
 
   <div class="meta">
-    <p><strong>Prepared For:</strong> ICT Director, Catholic University of Ghana</p>
-    <p><strong>Prepared By:</strong> Metascholar Consult Ltd</p>
-    <p><strong>System Area:</strong> Archival System, File Deposit, Exams File Deposit, Folder Access,
-       Memo System, Dashboard, User Profile, and Documentation</p>
+    <p><strong>Ref:</strong> {{ meta.ref }} &nbsp;·&nbsp; <strong>Date:</strong> {{ meta.report_date }}</p>
+    <p><strong>MDOI Memo Identifier:</strong> <a href="{{ meta.mdoi_url }}" target="_blank" rel="noopener noreferrer">{{ meta.mdoi_url }}</a></p>
+    <p><strong>Prepared For:</strong> Director, Catholic University of Ghana</p>
+    <p><strong>Prepared By:</strong> {{ meta.prepared_by }}</p>
+    <p><strong>Purpose:</strong> {{ meta.purpose }}</p>
+    <p style="font-style:italic;margin-top:8px;">Please review each item below and tick (&#10003;) the checkbox if the portion has been completed, tested, and verified. Sign off at the bottom to confirm system readiness.</p>
   </div>
 
-  {% for section in sections %}{% if forloop.first %}
+  {% for section in sections %}
   <h2>{{ section.title }}</h2>
-  <table>
-    <colgroup>
-      <col class="c-no"><col class="c-module"><col class="c-correction">
-      <col class="c-action"><col class="c-resp">
-    </colgroup>
-    <thead>
-      <tr>
-        <th>No.</th><th>Module / Section</th>
-        <th>Correction Given by ICT Director</th>
-        <th>Required System Update / Action</th>
-        <th>Response</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in section.items %}
-      <tr>
-        <td>{{ item.num }}</td>
-        <td>{{ item.module }}</td>
-        <td>{{ item.correction }}</td>
-        <td>{{ item.action }}</td>
-        <td>{% include "report/_answer_cell.html" %}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% endif %}{% endfor %}
+  {% include "report/_corrections_table.html" %}
+  {% endfor %}
 
-  <div class="footer">Page 1 of {{ sections|length|add:"1" }}</div>
-</section>
-
-<!-- ═══════════ MIDDLE PAGES — Remaining Sections ═══════════ -->
-{% for section in sections %}{% if not forloop.first %}
-<section class="page">
-  <h2>{{ section.title }}</h2>
-  <table>
-    <colgroup>
-      <col class="c-no"><col class="c-module"><col class="c-correction">
-      <col class="c-action"><col class="c-resp">
-    </colgroup>
-    <thead>
-      <tr>
-        <th>No.</th><th>Module / Section</th>
-        <th>Correction Given by ICT Director</th>
-        <th>Required System Update / Action</th>
-        <th>Response</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in section.items %}
-      <tr>
-        <td>{{ item.num }}</td>
-        <td>{{ item.module }}</td>
-        <td>{{ item.correction }}</td>
-        <td>{{ item.action }}</td>
-        <td>{% include "report/_answer_cell.html" %}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <div class="footer">Page {{ forloop.counter|add:"1" }} of {{ sections|length|add:"1" }}</div>
-</section>
-{% endif %}{% endfor %}
-
-<!-- ═══════════ LAST PAGE — Comments + Signature ═══════════ -->
-<section class="page">
   <div class="comments-section">
     <h2>Other Comments <span style="font-weight:normal;font-size:14px;text-transform:none;">(Optional)</span></h2>
     <textarea id="other-comments" class="textarea-input" placeholder="Add any additional comments here…"></textarea>
   </div>
 
   <div class="signature-section">
-    <h2>{{ sections|length|add:"1" }}.0 ICT Director Confirmation and Signature</h2>
-    <p class="intro">
-      I hereby confirm that the corrections listed above have been reviewed and that the items
-      ticked in the table have been duly completed.
-    </p>
+    <div class="signee-header">
+      <img src="{{ meta.director_photo }}" alt="Director" class="signee-photo" />
+      <div class="signee-header-text">
+        <h2>Director Confirmation and Signature</h2>
+        <p class="intro">
+          I hereby confirm that the corrections listed above have been reviewed and that the items
+          ticked in the table have been duly completed.
+        </p>
+      </div>
+    </div>
 
     <div class="field-row">
-      <span class="field-label">NAME OF ICT DIRECTOR:<span class="req">*</span></span>
+      <span class="field-label">NAME OF DIRECTOR:<span class="req">*</span></span>
       <div class="field-control">
-        <input type="text" id="director-name" class="text-input" placeholder="Enter full name" />
+        <input type="text" id="director-name" class="text-input" value="Selorm Kofi Tagbo" readonly />
       </div>
     </div>
 
@@ -393,8 +340,6 @@
       {% if has_submission %}Update Confirmation{% else %}Save Confirmation{% endif %}
     </button>
   </div>
-
-  <div class="footer">Page {{ sections|length|add:"1" }} of {{ sections|length|add:"1" }}</div>
 </section>
 
 <div class="modal-overlay" id="thank-you-modal" role="dialog" aria-modal="true">
@@ -637,7 +582,7 @@ function saveConfirmation() {
   if (sigBox) sigBox.classList.remove('sig-error');
 
   const errors = [];
-  if (!name) { errors.push('Name of ICT Director is required.'); nameEl.classList.add('field-error'); nameEl.focus(); }
+  if (!name) { errors.push('Name of Director is required.'); nameEl.classList.add('field-error'); nameEl.focus(); }
   if (!sigData) { errors.push('Signature is required.'); if (sigBox) sigBox.classList.add('sig-error'); }
   if (!date) { errors.push('Date is required.'); dateEl.classList.add('field-error'); }
 
@@ -658,7 +603,7 @@ function saveConfirmation() {
         showToast('A confirmation under this name is already permanently recorded.', true);
         saveBtn.disabled = false; saveBtn.textContent = 'Save Confirmation';
       } else if (d.error === 'name_required') {
-        showToast('Please enter the name of the ICT Director.', true);
+        showToast('Please enter the name of the Director.', true);
         nameEl.classList.add('field-error'); nameEl.focus();
         saveBtn.disabled = false; saveBtn.textContent = 'Save Confirmation';
       } else {

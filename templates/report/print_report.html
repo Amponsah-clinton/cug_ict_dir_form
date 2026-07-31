@@ -157,7 +157,17 @@
 
     /* ── Signature section ───────────────────────────── */
     .sig-section { margin-top: 22px; }
-    .sig-section > .intro { font-size: 14.5px; font-style: italic; margin: 0 0 18px; line-height: 1.5; }
+    .intro { font-size: 14.5px; font-style: italic; margin: 0; line-height: 1.5; }
+
+    /* ── Signee (Director) header with portrait ── */
+    .signee-header { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+    .signee-photo {
+      width: 84px; height: 84px; border-radius: 50%;
+      object-fit: cover; flex-shrink: 0; background: #eee;
+      border: 2.5px solid #1a1a1a; box-shadow: 0 2px 8px rgba(0,0,0,0.22);
+    }
+    .signee-header-text { flex: 1; min-width: 0; }
+    .signee-header-text h2 { margin: 0 0 6px; }
 
     .field-row {
       display: flex;
@@ -219,9 +229,7 @@
       .page {
         margin: 0;
         box-shadow: none;
-        page-break-after: always;
       }
-      .page:last-child { page-break-after: auto; }
     }
   </style>
 </head>
@@ -236,73 +244,30 @@
   <button class="btn-print" onclick="window.print()">&#128424; Save as PDF / Print</button>
 </div>
 
-<!-- ══════════════ MAIN CONTENT PAGE ══════════════ -->
 <section class="page">
   <div class="header">
     <h1 style="text-align:center;">
       METASCHOLAR CONSULT LTD<br>
-      <span style="text-transform:none;">University Digital Transformation Suite (UDTS)</span><br>
-      FOR THE ICT DIRECTOR, CATHOLIC UNIVERSITY OF GHANA
+      <span style="text-transform:none;">{{ meta.title }}</span><br>
+      <span style="text-transform:none;font-weight:normal;">{{ meta.subtitle }}</span>
     </h1>
   </div>
 
   <div class="meta">
-    <p><strong>Prepared For:</strong> ICT Director, Catholic University of Ghana</p>
-    <p><strong>Prepared By:</strong> Metascholar Consult Ltd</p>
-    <p><strong>System Area:</strong> Archival System, File Deposit, Exams File Deposit, Folder Access,
-       Memo System, Dashboard, User Profile, and Documentation</p>
+    <p><strong>Ref:</strong> {{ meta.ref }} &nbsp;·&nbsp; <strong>Date:</strong> {{ meta.report_date }}</p>
+    <p><strong>MDOI Memo Identifier:</strong> <a href="{{ meta.mdoi_url }}" target="_blank" rel="noopener noreferrer">{{ meta.mdoi_url }}</a></p>
+    <p><strong>Prepared For:</strong> Director, Catholic University of Ghana</p>
+    <p><strong>Prepared By:</strong> {{ meta.prepared_by }}</p>
+    <p><strong>Purpose:</strong> {{ meta.purpose }}</p>
     <p style="margin-top:6px"><strong>Report Generated:</strong> {{ submitted_at }}</p>
   </div>
 
   {% for section in sections %}
   <div class="section-block">
     <h2>{{ section.title }}</h2>
-    <table>
-      <colgroup>
-        <col class="c-no"><col class="c-module"><col class="c-correction">
-        <col class="c-action"><col class="c-tick">
-      </colgroup>
-      <thead>
-        <tr>
-          <th>No.</th>
-          <th>Module / Section</th>
-          <th>Correction Given by ICT Director</th>
-          <th>Required System Update / Action</th>
-          <th>Response</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in section.items %}
-        <tr>
-          <td>{{ item.num }}</td>
-          <td>{{ item.module }}</td>
-          <td>{{ item.correction }}</td>
-          <td>{{ item.action }}</td>
-          <td class="tick-cell">
-            {% if item.answer_type == "yes_no" %}
-              <span class="ans-badge-print">Yes / No</span><br>
-              <span class="ans-text-val">{{ item.answer_value|default:"—"|title }}</span>
-            {% elif item.answer_type == "true_false" %}
-              <span class="ans-badge-print">True / False</span><br>
-              <span class="ans-text-val">{{ item.answer_value|default:"—"|title }}</span>
-            {% elif item.answer_type == "text" %}
-              <span class="ans-text-val">{{ item.answer_value|default:"" }}</span>
-            {% else %}
-              {% if item.is_done or item.id in done_set %}<span class="tick-done"></span>{% else %}<span class="tick-empty"></span>{% endif %}
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    {% include "report/_corrections_table_print.html" %}
   </div>
   {% endfor %}
-
-  <div class="report-footer">{{ done_count }} of {{ total }} corrections completed &nbsp;·&nbsp; Submitted {{ submitted_at }}</div>
-</section>
-
-<!-- ══════════════ SIGNATURE PAGE ══════════════ -->
-<section class="page">
 
   <!-- ── Other Comments ── -->
   {% if confirmation.other_comments %}
@@ -314,14 +279,19 @@
 
   <!-- ── Confirmation with real rendered signature ── -->
   <div class="sig-section">
-    <h2>ICT Director Confirmation and Signature</h2>
-    <p class="intro">
-      I hereby confirm that the corrections listed above have been reviewed and that the items
-      ticked / responded to in the table have been duly completed.
-    </p>
+    <div class="signee-header">
+      <img src="{{ meta.director_photo }}" alt="Director" class="signee-photo" />
+      <div class="signee-header-text">
+        <h2>Director Confirmation and Signature</h2>
+        <p class="intro">
+          I hereby confirm that the corrections listed above have been reviewed and that the items
+          ticked / responded to in the table have been duly completed.
+        </p>
+      </div>
+    </div>
 
     <div class="field-row">
-      <span class="field-label">NAME OF ICT DIRECTOR:</span>
+      <span class="field-label">NAME OF DIRECTOR:</span>
       <div class="field-value">{{ confirmation.director_name|default:"" }}</div>
     </div>
 
@@ -346,7 +316,7 @@
     {% endif %}
   </div>
 
-  <div class="report-footer">Submitted {{ submitted_at }} &nbsp;·&nbsp; Metascholar Consult Ltd</div>
+  <div class="report-footer">{{ done_count }} of {{ total }} corrections completed &nbsp;·&nbsp; Submitted {{ submitted_at }} &nbsp;·&nbsp; Metascholar Consult Ltd</div>
 </section>
 
 </body>

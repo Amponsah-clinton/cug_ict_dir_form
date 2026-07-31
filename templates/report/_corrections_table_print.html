@@ -1,0 +1,36 @@
+{% load report_extras %}
+<table>
+  <colgroup>
+    <col class="c-no">
+    {% for col in section.columns %}<col>{% endfor %}
+    <col class="c-tick">
+  </colgroup>
+  <thead>
+    <tr>
+      <th>No.</th>
+      {% for col in section.columns %}<th>{{ col.label }}</th>{% endfor %}
+      <th>{{ section.response_label|default:"Response" }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in section.items %}
+    <tr>
+      <td>{{ item.num }}</td>
+      {% for col in section.columns %}<td>{{ item|get_item:col.key }}</td>{% endfor %}
+      <td class="tick-cell">
+        {% if item.answer_type == "yes_no" %}
+          <span class="ans-badge-print">Yes / No</span><br>
+          <span class="ans-text-val">{{ item.answer_value|default:"—"|title }}</span>
+        {% elif item.answer_type == "true_false" %}
+          <span class="ans-badge-print">True / False</span><br>
+          <span class="ans-text-val">{{ item.answer_value|default:"—"|title }}</span>
+        {% elif item.answer_type == "text" %}
+          <span class="ans-text-val">{{ item.answer_value|default:"" }}</span>
+        {% else %}
+          {% if item.is_done or item.id in done_set %}<span class="tick-done"></span>{% else %}<span class="tick-empty"></span>{% endif %}
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

@@ -1,142 +1,138 @@
 """
-Static correction items. Only the is_done status lives in Supabase.
+Static correction items — CHECK REPORT: Verification of Completed Fixes (27 July 2026).
+Only the is_done/verified status lives in Supabase.
 Each item's 'id' is the key used for Supabase upsert/lookup.
+
+Each section defines 'columns': which item fields to render as table
+columns on the public form / print report, in order. Sections omitted
+from SECTION_COLUMNS (e.g. sections added later via the admin UI)
+fall back to the default 3-column layout in views.py.
 """
+
+# Director portrait shown alongside the confirmation declaration.
+# Embedded as a data URI (not a static file) so it always renders regardless
+# of whether collectstatic has run in the deployment environment.
+DIRECTOR_PHOTO = "data:image/jpeg;base64,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"
+
+REPORT_META = {
+    'ref': 'MS-4466004343500',
+    'mdoi_url': 'https://mdoi.org/110.0820/CON.2026.00791',
+    'report_date': '27th July 2026',
+    'title': 'CHECK REPORT: METASCHOLAR UNIVERSITY DIGITAL TRANSFORMATION SUITE (UDTS)',
+    'subtitle': 'Verification of Completed Fixes',
+    'prepared_by': 'Metascholar Consult Limited',
+    'purpose': 'To confirm that all identified issues stated on the report have been resolved and tested.',
+    'director_photo': DIRECTOR_PHOTO,
+}
 
 SECTIONS = [
     {
-        'title': '1.0 CORRECTIONS GIVEN ON SUNDAY, 17TH MAY, 2026',
+        'title': 'Issue Description & Fix Implemented',
+        'section_key': 's1_issues',
+        'response_label': 'Verified',
+        'columns': [
+            {'key': 'correction', 'label': 'Issue Description'},
+            {'key': 'action', 'label': 'Fix Implemented'},
+        ],
         'items': [
             {
-                'id': 's1_01', 'num': 1, 'module': 'File Deposit',
-                'correction': "The depositor's name and email should be non-responsive/non-editable.",
-                'action': "Make the depositor's name and email read-only so users cannot edit or change them during file deposit.",
+                'id': 'ck_01', 'num': 1, 'module': '',
+                'correction': "Any user enrolled in the system can approve a memo; for example, when a procurement memo goes through the system and gets to the VC, if the VC should minute to the Director of Finance, “let's discuss”, the system gives the Director of Finance the option to approve the memo instead of the VC approving the memo.",
+                'action': "Strict role-based approval logic implemented. Only designated approvers (e.g., VC) can final-approve memos. Officers minuted for discussion can now only add comments; approval permissions are locked to the correct role.",
             },
             {
-                'id': 's1_02', 'num': 2, 'module': 'File Deposit',
-                'correction': "The depositor's unit/department should be static with no editable option.",
-                'action': "Auto-display the depositor's unit or department as read-only.",
+                'id': 'ck_02', 'num': 2, 'module': '',
+                'correction': "A memo cannot be sent to all people in a particular department at a goal; the user has to recall all the people in the department and select their names one after the other. E.g., the Registrar cannot send a memo to all members of the Law Faculty with one click; he has to select the names of all Law Faculty members one after the other.",
+                'action': "“Send to Department” function with “Select All” toggle added. Users can now send memos to entire departments or user groups instantly without selecting individuals one by one.",
             },
             {
-                'id': 's1_03', 'num': 3, 'module': 'File Deposit',
-                'correction': "If a depositor belongs to two departments, all departments should show.",
-                'action': "Configure the system to display all assigned departments/units linked to the depositor.",
+                'id': 'ck_03', 'num': 3, 'module': '',
+                'correction': "In the procurement form, where the VC should input the amount of the item being purchased has been assigned to the Registrar.",
+                'action': "Field permissions reconfigured. The “Amount” field is now exclusively editable by the VC. Every form field has been remapped to the correct role based on documented university workflows.",
             },
             {
-                'id': 's1_04', 'num': 4, 'module': 'File Deposit',
-                'correction': "Uploaded files should not be downloadable.",
-                'action': "Disable download access for deposited files where required.",
+                'id': 'ck_04', 'num': 4, 'module': '',
+                'correction': "The procurement form could only be filled by the originator of the memo when the memo is approved; it could not be minuted to the Procurement Officer for onward processing.",
+                'action': "We redesigned the workflow. Once the memo is approved the requisitioner can route the memo to the procurement officer and can even select a user to fill the form on the requisitioner's behalf.",
             },
             {
-                'id': 's1_05', 'num': 5, 'module': 'File Deposit',
-                'correction': "Uploaded files should be previewable.",
-                'action': "Add file preview functionality for deposited files.",
+                'id': 'ck_05', 'num': 5, 'module': '',
+                'correction': "Budget Officer lacked permission to fill their portion of the finance form before forwarding to Director of Finance.",
+                'action': "Granular permissions added for the Budget Officer. The finance section is now sequential: Budget Officer fills assigned fields → forwards to Director of Finance → Director reviews and submits final approval.",
             },
             {
-                'id': 's1_06', 'num': 6, 'module': 'File Deposit',
-                'correction': "After successful upload, the file name should be editable.",
-                'action': "Allow authorized users to edit only the file name after upload, without changing the file content.",
+                'id': 'ck_06', 'num': 6, 'module': '',
+                'correction': "The developers do not know how the workflow of the various forms (Procurement, Leave, etc.) in the University works.",
+                'action': "On-site workflow mapping sessions conducted with Madam Millicent (current HR Manager) and Madam Mercy (former HR Manager). All forms re-implemented to exactly mirror step-by-step manual processes.",
             },
             {
-                'id': 's1_07', 'num': 7, 'module': 'File Deposit',
-                'correction': "There should be a folder where specific files will be saved.",
-                'action': "Create or assign specific folders for categorised storage of selected files.",
+                'id': 'ck_07', 'num': 7, 'module': '',
+                'correction': "One administrator in a department can create a folder for other departments, which is wrong. If not retracted, there will be chaos in how folders and files are accessed in the system.",
+                'action': "Folder creation permissions restricted. Each department administrator can now only create, modify, or delete folders within their own department. Cross-department folder access is blocked.",
             },
             {
-                'id': 's1_08', 'num': 8, 'module': 'Archive System',
-                'correction': "When a folder is created, users should be added to access the folder.",
-                'action': "Add folder-level access control to allow selected users to access specific folders.",
-            },
-            {
-                'id': 's1_09', 'num': 9, 'module': 'Exams File Deposit',
-                'correction': "The depositor's name and email should be non-responsive/non-editable.",
-                'action': "Make the depositor's name and email read-only during exams file deposit.",
-            },
-            {
-                'id': 's1_10', 'num': 10, 'module': 'Exams File Deposit',
-                'correction': "The depositor's unit should be static with no selectable/editable option.",
-                'action': "Auto-display the depositor's unit as read-only during exams file deposit.",
-            },
-            {
-                'id': 's1_11', 'num': 11, 'module': 'Exams File Deposit',
-                'correction': "A future date, 20th May, was selected successfully; this should not be allowed.",
-                'action': "Restrict date selection to today's date or yesterday's date only. Tomorrow or any future date should be blocked.",
-            },
-            {
-                'id': 's1_12', 'num': 12, 'module': 'Folder Creation',
-                'correction': "After creating a folder, the folder does not appear in the folder list.",
-                'action': "Fix the folder creation process so newly created folders appear immediately in the folder section.",
-            },
-            {
-                'id': 's1_13', 'num': 13, 'module': 'Folder Creation',
-                'correction': 'File names should follow a clear naming format such as “Information Technology – Date Deposited.”',
-                'action': "Apply a standard file-naming format using department/unit name and date of deposit for easy identification.",
+                'id': 'ck_08', 'num': 8, 'module': '',
+                'correction': "There is no overall administrator who creates folders for all departments and can delete or modify as appropriate.",
+                'action': "New “System Administrator” role created with full rights to create, modify, and delete folders across all departments, ensuring centralized oversight when necessary.",
             },
         ],
     },
     {
-        'title': '2.0 CORRECTIONS GIVEN ON THURSDAY, 11TH JUNE, 2026',
+        'title': 'Testing and Validation Checklist',
+        'section_key': 's2_testing',
+        'response_label': 'Status',
+        'columns': [
+            {'key': 'module', 'label': 'Test Phase'},
+            {'key': 'correction', 'label': 'Activity'},
+        ],
         'items': [
-            {
-                'id': 's2_01', 'num': 1, 'module': 'Login / System Alert',
-                'correction': "Remove the long Meta IronDom alert at login.",
-                'action': "Remove or shorten the login alert message to improve user experience.",
-            },
-            {
-                'id': 's2_02', 'num': 2, 'module': 'Compose Memo',
-                'correction': "Add memo type selection after letterhead selection and before memo subject.",
-                'action': "Add radio buttons for memo type: Promotion Memo, Procurement Memo, Leave Memo, and Other.",
-            },
-            {
-                'id': 's2_03', 'num': 3, 'module': 'Memo Notification / Bell Alert',
-                'correction': "When a user receives a memo alert through the bell notification, the privileges to act on the memo should also be available in the memo portal.",
-                'action': "Ensure that users can open, view, comment, act, or respond to memo notifications according to their assigned privileges.",
-            },
-            {
-                'id': 's2_04', 'num': 4, 'module': 'Compose Memo',
-                'correction': 'Add a “Through” button/field to the memo routing structure.',
-                'action': 'Add a “Through” field between “To” and “Cc” to support formal memo routing.',
-            },
-            {
-                'id': 's2_05', 'num': 5, 'module': 'Compose Memo',
-                'correction': "Memo format should support: From, To, Through, Cc, and Subject.",
-                'action': "Configure memo layout to follow the structure: From: Ag. ICT Director; To: Vice-Chancellor; Through: Pro Vice-Chancellor; Cc: Dean of CEMS, RSS; Subject: Purchase of Clocking Machine.",
-            },
-            {
-                'id': 's2_06', 'num': 6, 'module': 'Compose Memo / Cc Function',
-                'correction': "Persons copied in Cc should have an option to comment on the memo.",
-                'action': "Enable comment privileges for users copied in the Cc field.",
-            },
-            {
-                'id': 's2_07', 'num': 7, 'module': 'Export / Print / PDF Preview',
-                'correction': "Export and print should include preview of uploaded PDF together with memo content.",
-                'action': "Ensure exported or printed memo documents include both the memo content and attached PDF preview where applicable.",
-            },
-            {
-                'id': 's2_08', 'num': 8, 'module': 'Dashboard',
-                'correction': "Close to the bell notification icon, there should be a button indicating whether the page is User or Admin.",
-                'action': "Add a clear User/Admin mode indicator on the dashboard near the notification bell.",
-            },
-            {
-                'id': 's2_09', 'num': 9, 'module': 'User Profile / Normal Users',
-                'correction': "Normal users should not be able to edit their position or other official profile sections.",
-                'action': "Make official user profile details such as position, department, and role static/read-only for normal users.",
-            },
-            {
-                'id': 's2_10', 'num': 10, 'module': 'Documentation Menu',
-                'correction': '“System Documentation” should be changed to “University Policies.”',
-                'action': 'Rename the menu item from “System Documentation” to “University Policies.”',
-            },
-            {
-                'id': 's2_11', 'num': 11, 'module': 'User Manual',
-                'correction': 'Add another button called “User Manual.”',
-                'action': 'Add a separate “User Manual” button/menu item for system usage guidance.',
-            },
-            {
-                'id': 's2_12', 'num': 12, 'module': 'CSV File Preview',
-                'correction': "CSV files were uploaded but could not be previewed.",
-                'action': "Add preview support for uploaded CSV files.",
-            },
+            {'id': 'tv_01', 'num': 1, 'module': 'Phase 1', 'correction': 'Internal unit testing of each individual fix', 'action': ''},
+            {'id': 'tv_02', 'num': 2, 'module': 'Phase 2', 'correction': 'Integrated system testing across all workflows', 'action': ''},
+            {'id': 'tv_03', 'num': 3, 'module': 'Phase 3', 'correction': 'User Acceptance Testing (UAT) with department heads and key stakeholders', 'action': ''},
+            {'id': 'tv_04', 'num': 4, 'module': 'Phase 4', 'correction': 'Final regression testing to ensure no new issues were introduced', 'action': ''},
+            {'id': 'tv_05', 'num': 5, 'module': 'Phase 5', 'correction': 'Security and access control testing', 'action': ''},
+            {'id': 'tv_06', 'num': 6, 'module': 'Phase 6', 'correction': 'Performance and load testing', 'action': ''},
         ],
     },
+    {
+        'title': 'Consultation Confirmation',
+        'section_key': 's3_consultation',
+        'response_label': 'Status',
+        'columns': [
+            {'key': 'correction', 'label': 'Consultation Activity'},
+        ],
+        'items': [
+            {'id': 'cc_01', 'num': 1, 'module': '', 'correction': 'Consulted Madam Millicent (current HR Manager) on form workflows and role assignments', 'action': ''},
+            {'id': 'cc_02', 'num': 2, 'module': '', 'correction': 'Consulted Madam Mercy (former HR Manager) on historical procedures and best practices', 'action': ''},
+            {'id': 'cc_03', 'num': 3, 'module': '', 'correction': 'Incorporated feedback from HR and administrative stakeholders into final system', 'action': ''},
+        ],
+    },
+    {
+        'title': 'Final Verification',
+        'section_key': 's4_final',
+        'response_label': 'Status',
+        'columns': [
+            {'key': 'correction', 'label': 'Item'},
+        ],
+        'items': [
+            {'id': 'fv_01', 'num': 1, 'module': '', 'correction': 'All fixes implemented as described above', 'action': ''},
+            {'id': 'fv_02', 'num': 2, 'module': '', 'correction': 'All testing phases successfully completed', 'action': ''},
+            {'id': 'fv_03', 'num': 3, 'module': '', 'correction': 'System ready for full rollout', 'action': ''},
+            {'id': 'fv_04', 'num': 4, 'module': '', 'correction': 'User manuals and training guides prepared', 'action': ''},
+            {'id': 'fv_05', 'num': 5, 'module': '', 'correction': 'On-site training support scheduled', 'action': ''},
+        ],
+    },
+]
+
+# Keyed by section_key so Supabase-sourced sections (which don't carry
+# column/response-label metadata in the DB row) can still render correctly.
+SECTION_LAYOUT = {
+    sec['section_key']: {'columns': sec['columns'], 'response_label': sec['response_label']}
+    for sec in SECTIONS
+}
+
+DEFAULT_COLUMNS = [
+    {'key': 'module', 'label': 'Module / Section'},
+    {'key': 'correction', 'label': 'Correction Given'},
+    {'key': 'action', 'label': 'Required System Update / Action'},
 ]

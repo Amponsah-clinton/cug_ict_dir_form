@@ -1,0 +1,24 @@
+{% load report_extras %}
+<table>
+  <colgroup>
+    <col class="c-no">
+    {% for col in section.columns %}<col>{% endfor %}
+    <col class="c-resp">
+  </colgroup>
+  <thead>
+    <tr>
+      <th>No.</th>
+      {% for col in section.columns %}<th>{{ col.label }}</th>{% endfor %}
+      <th>{{ section.response_label|default:"Response" }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in section.items %}
+    <tr>
+      <td>{{ item.num }}</td>
+      {% for col in section.columns %}<td>{{ item|get_item:col.key }}</td>{% endfor %}
+      <td>{% include "report/_answer_cell.html" %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
