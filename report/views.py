@@ -57,8 +57,8 @@ def _send_notification(director_name, signature_date, submission_id):
     subject = 'CUG Archival System — Corrections Report Submitted'
     host = os.getenv('SITE_URL', 'http://udtsform.sslip.io')
     text = (
-        f"The Director Confirmation Form has been submitted.\n\n"
-        f"Director: {director_name or '(not entered)'}\n"
+        f"The Technical Arbiter Confirmation Form has been submitted.\n\n"
+        f"Technical Arbiter: {director_name or '(not entered)'}\n"
         f"Date:     {signature_date or '(not entered)'}\n\n"
         f"View the admin dashboard: {host}/admin/\n"
         f"Print / export report:    {host}/admin/print/{submission_id}/\n"
@@ -70,9 +70,9 @@ def _send_notification(director_name, signature_date, submission_id):
       <p style="color:#aaa;margin:4px 0 0">Archival Corrections Report — Form Submitted</p>
     </div>
     <div style="background:#f9f9f9;padding:24px 30px;border:1px solid #ddd;border-top:none;border-radius:0 0 6px 6px">
-      <p>The Director Confirmation Form has been filled and saved.</p>
+      <p>The Technical Arbiter Confirmation Form has been filled and saved.</p>
       <table style="border-collapse:collapse;width:100%;margin:16px 0">
-        <tr><td style="padding:6px 0;font-weight:bold;width:120px">Director</td>
+        <tr><td style="padding:6px 0;font-weight:bold;width:120px">Technical Arbiter</td>
             <td style="padding:6px 0">{director_name or '<em>not entered</em>'}</td></tr>
         <tr><td style="padding:6px 0;font-weight:bold">Date</td>
             <td style="padding:6px 0">{signature_date or '<em>not entered</em>'}</td></tr>
@@ -257,11 +257,11 @@ def update_correction(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-# ── API: save Director's answer (yes_no / true_false / text types) ───────────
+# ── API: save Technical Arbiter's answer (yes_no / true_false / text types) ──
 
 @require_http_methods(['POST'])
 def save_answer(request):
-    """Persist the Director's typed/selected answer for a non-checkbox item."""
+    """Persist the Technical Arbiter's typed/selected answer for a non-checkbox item."""
     try:
         data          = json.loads(request.body)
         correction_id = data.get('correction_id', '').strip()
@@ -292,7 +292,7 @@ def save_confirmation(request):
         svc      = get_service_client()
 
         if not name:
-            return JsonResponse({'error': 'name_required', 'message': 'Director name is required.'}, status=400)
+            return JsonResponse({'error': 'name_required', 'message': 'Technical Arbiter name is required.'}, status=400)
 
         name_match = (
             svc.table('cug_director_confirmation')
