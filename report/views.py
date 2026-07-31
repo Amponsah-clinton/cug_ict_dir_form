@@ -446,6 +446,21 @@ def delete_submission(request, submission_id):
         verify = svc.table('cug_director_confirmation').select('id').eq('id', submission_id).execute()
         if verify.data:
             return JsonResponse({'error': 'Delete did not complete — check Supabase RLS policies.'}, status=500)
+
+        # Reset the shared checklist so the next fill-out starts from a clean
+        # slate instead of carrying over check-marks from the deleted run.
+        now_iso = datetime.now(timezone.utc).isoformat()
+        try:
+            svc.table('cug_correction_items').update(
+                {'is_done': False, 'answer_value': None, 'updated_at': now_iso}
+            ).gt('id', 0).execute()
+        except Exception:
+            pass
+        try:
+            svc.table('cug_corrections').update({'is_done': False}).neq('correction_id', '__none__').execute()
+        except Exception:
+            pass
+
         return JsonResponse({'success': True})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)

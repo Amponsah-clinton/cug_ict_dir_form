@@ -30,7 +30,7 @@
   </div>
 {% else %}
   <div style="display:flex;align-items:center;gap:6px">
-    <input type="checkbox" class="checkbox" data-id="{{ item.id }}">
+    <input type="checkbox" class="checkbox" data-id="{{ item.id }}" {% if item.is_done or item.id in done_set %}checked{% endif %}>
     <span class="saving-dot"></span>
   </div>
 {% endif %}
