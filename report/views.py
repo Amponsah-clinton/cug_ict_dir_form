@@ -10,7 +10,9 @@ from django.views.decorators.http import require_http_methods
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from .supabase_client import get_client, get_service_client
-from .corrections_data import SECTIONS, SECTION_LAYOUT, DEFAULT_COLUMNS, REPORT_META
+from .corrections_data import (
+    SECTIONS, SECTION_LAYOUT, DEFAULT_COLUMNS, REPORT_META, REMOVED_SECTION_KEYS,
+)
 
 EDIT_WINDOW = getattr(settings, 'FORM_EDIT_WINDOW', 600)
 NOTIFY = getattr(settings, 'FORM_NOTIFICATION_EMAILS', [])
@@ -127,6 +129,8 @@ def _fetch_all_corrections_supabase():
 
         for row in result.data:
             sk = row['section_key']
+            if sk in REMOVED_SECTION_KEYS:
+                continue
             if sk not in sections_map:
                 layout = SECTION_LAYOUT.get(sk, {})
                 sections_map[sk] = {
@@ -319,6 +323,7 @@ def save_confirmation(request):
                 svc.table('cug_director_confirmation').update(
                     {'director_name': name, 'signature_date': date}
                 ).eq('id', row['id']).execute()
+            request.session['my_submission_id'] = row['id']
             return JsonResponse({'success': True, 'submission_id': row['id'], 'updated': True})
         else:
             try:
@@ -330,6 +335,8 @@ def save_confirmation(request):
                     {'director_name': name, 'signature_date': date}
                 ).execute()
             sub_id = ins.data[0]['id'] if ins.data else None
+            if sub_id:
+                request.session['my_submission_id'] = sub_id
             _send_notification(name, date, sub_id)
             return JsonResponse({'success': True, 'submission_id': sub_id, 'updated': False})
 
@@ -469,13 +476,30 @@ def delete_submission(request, submission_id):
 # ── Thanks page ──────────────────────────────────────────────────────────────
 
 def thanks_view(request):
-    return render(request, 'report/thanks.html')
+    return render(request, 'report/thanks.html', {
+        'my_submission_id': request.session.get('my_submission_id'),
+    })
 
 
 # ── Print / PDF view ─────────────────────────────────────────────────────────
 
 @admin_login_required
 def print_report(request, submission_id):
+    return _render_report(request, submission_id, is_public=False)
+
+
+def my_report(request):
+    """
+    Lets the person who just filled the form download / print their own copy.
+    Access is limited to the submission recorded in their own session.
+    """
+    submission_id = request.session.get('my_submission_id')
+    if not submission_id:
+        raise Http404('No submission found for this session.')
+    return _render_report(request, submission_id, is_public=True)
+
+
+def _render_report(request, submission_id, is_public):
     client = get_client()
 
     try:
@@ -509,6 +533,7 @@ def print_report(request, submission_id):
         'done_count': len(done_set),
         'total': sum(len(s['items']) for s in sections),
         'meta': REPORT_META,
+        'is_public': is_public,
     }
     return render(request, 'report/print_report.html', context)
 

@@ -31,4 +31,5 @@ urlpatterns = [
     path('admin/api/sections/<str:section_key>/delete/', views.admin_delete_section, name='admin_delete_section'),
 
     path('thanks/', views.thanks_view, name='thanks'),
+    path('my-report/', views.my_report, name='my_report'),
 ]

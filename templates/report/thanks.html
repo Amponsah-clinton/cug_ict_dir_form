@@ -17,11 +17,40 @@
     }
     .center { text-align: center; padding: 40px 24px; }
     .title  { font-size: 32px; font-weight: bold; line-height: 1.4; }
+
+    .check {
+      width: 62px; height: 62px; border-radius: 50%;
+      background: #dcfce7; color: #15803d;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; margin: 0 auto 18px;
+    }
+    .note {
+      font-family: system-ui, sans-serif;
+      font-size: 15px; color: #475569; line-height: 1.6;
+      margin: 14px auto 0; max-width: 480px;
+    }
+    .btn-download {
+      display: inline-block;
+      margin-top: 26px;
+      padding: 12px 30px;
+      background: #1a1a1a; color: #fff;
+      font-family: system-ui, sans-serif; font-size: 15px;
+      border-radius: 6px; text-decoration: none;
+    }
+    .btn-download:hover { background: #333; }
   </style>
 </head>
 <body>
   <div class="center">
+    {% if my_submission_id %}<div class="check">&#10003;</div>{% endif %}
     <p class="title">University Digital Transformation Suite (UDTS)</p>
+    {% if my_submission_id %}
+      <p class="note">
+        Your confirmation and signature have been recorded.<br>
+        You can download or print a copy of the form you just filled.
+      </p>
+      <a class="btn-download" href="/my-report/">&#11015; Download / Print My Copy</a>
+    {% endif %}
   </div>
 </body>
 </html>

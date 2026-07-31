@@ -231,6 +231,60 @@
     .modal-box h2 { font-size: 22px; font-weight: 700; color: #0f172a; margin: 0 0 10px; }
     .modal-box p  { font-size: 15px; color: #475569; line-height: 1.6; margin: 0 0 28px; }
 
+    /* ── Preview modal ── */
+    .preview-box {
+      background: #fff; border-radius: 12px;
+      width: 96%; max-width: 1000px; max-height: 92vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      transform: translateY(16px); transition: transform 0.25s;
+      overflow: hidden;
+    }
+    .modal-overlay.open .preview-box { transform: translateY(0); }
+    .preview-head {
+      padding: 22px 28px 16px; border-bottom: 1px solid #e2e8f0;
+      font-family: system-ui, sans-serif;
+    }
+    .preview-head h2 { margin: 0 0 6px; font-size: 20px; color: #0f172a; }
+    .preview-head p  { margin: 0; font-size: 13.5px; color: #64748b; }
+    .preview-body {
+      padding: 22px 28px; overflow-y: auto; flex: 1;
+      font-family: "Times New Roman", Times, serif;
+    }
+    .preview-body h3 {
+      font-size: 15.5px; text-transform: uppercase; margin: 22px 0 10px;
+    }
+    .preview-body h3:first-child { margin-top: 0; }
+    .preview-body table { font-size: 14px; }
+    .preview-body .saving-dot { display: none; }
+    .pv-answer {
+      font-family: system-ui, sans-serif; font-size: 13px; font-weight: 600;
+    }
+    .pv-yes { color: #15803d; }
+    .pv-no  { color: #b91c1c; }
+    .pv-empty { color: #94a3b8; font-style: italic; font-weight: normal; }
+    .pv-field {
+      display: flex; gap: 14px; margin: 12px 0; font-size: 15px;
+      align-items: flex-start;
+    }
+    .pv-field .pv-label { min-width: 230px; }
+    .pv-field .pv-value { flex: 1; border-bottom: 1px solid #333; padding-bottom: 2px; min-height: 22px; }
+    .pv-sig { max-height: 120px; max-width: 100%; object-fit: contain; border: 1px solid #ddd; border-radius: 4px; background: #fafafa; }
+    .preview-foot {
+      padding: 16px 28px; border-top: 1px solid #e2e8f0;
+      display: flex; justify-content: flex-end; gap: 12px;
+      font-family: system-ui, sans-serif; background: #f8fafc;
+    }
+    .btn-secondary, .btn-primary {
+      padding: 10px 24px; font-size: 14.5px; border-radius: 6px; cursor: pointer;
+      font-family: system-ui, sans-serif;
+    }
+    .btn-secondary { background: #fff; color: #334155; border: 1px solid #cbd5e1; }
+    .btn-secondary:hover { background: #f1f5f9; }
+    .btn-primary { background: #15803d; color: #fff; border: none; }
+    .btn-primary:hover:not(:disabled) { background: #166534; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
     /* ── Toast ── */
     .toast {
       position: fixed; bottom: 28px; right: 28px;
@@ -255,7 +309,7 @@
     /* ── Print ── */
     @media print {
       body { background: #fff; }
-      .admin-bar, .btn-save, .btn-clear, .toast { display: none; }
+      .admin-bar, .btn-save, .btn-clear, .toast, .modal-overlay { display: none; }
       .page {
         width: 210mm; max-width: 210mm; margin: 0;
         padding: 22mm 18mm 18mm; box-shadow: none;
@@ -306,8 +360,10 @@
   </div>
 
   {% for section in sections %}
-  <h2>{{ section.title }}</h2>
-  {% include "report/_corrections_table.html" %}
+  <div class="section-block" data-section>
+    <h2>{{ section.title }}</h2>
+    {% include "report/_corrections_table.html" %}
+  </div>
   {% endfor %}
 
   <div class="comments-section">
@@ -357,11 +413,28 @@
       </div>
     </div>
 
-    <button class="btn-save" id="btn-save" type="button" onclick="saveConfirmation()">
-      {% if has_submission %}Update Confirmation{% else %}Save Confirmation{% endif %}
+    <button class="btn-save" id="btn-save" type="button" onclick="openPreview()">
+      Preview &amp; Submit
     </button>
+    <p style="font-family:system-ui,sans-serif;font-size:13px;color:#64748b;margin-top:8px;">
+      You will be able to review everything you filled before it is submitted.
+    </p>
   </div>
 </section>
+
+<div class="modal-overlay" id="preview-modal" role="dialog" aria-modal="true" aria-label="Preview submission">
+  <div class="preview-box">
+    <div class="preview-head">
+      <h2>Review Your Submission</h2>
+      <p>Check everything below carefully. Nothing is submitted until you press <strong>Confirm &amp; Submit</strong>.</p>
+    </div>
+    <div class="preview-body" id="preview-body"></div>
+    <div class="preview-foot">
+      <button type="button" class="btn-secondary" onclick="closePreview()">← Back to Edit</button>
+      <button type="button" class="btn-primary" id="btn-confirm-submit" onclick="saveConfirmation()">Confirm &amp; Submit</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal-overlay" id="thank-you-modal" role="dialog" aria-modal="true">
   <div class="modal-box">
@@ -587,55 +660,179 @@ window.addEventListener('load', function () {
   };
 });
 
-/* ── Save confirmation ── */
-function saveConfirmation() {
-  const nameEl     = document.getElementById('director-name');
-  const dateEl     = document.getElementById('conf-date');
+/* ══════════════════════════════════════════════════════════
+   PREVIEW BEFORE SUBMISSION
+   ══════════════════════════════════════════════════════════ */
+
+/* Collect the current state of the whole form. */
+function collectForm() {
   const commentsEl = document.getElementById('other-comments');
-  const sigBox     = document.querySelector('.sig-container');
-  const name       = nameEl.value.trim();
-  const date       = dateEl.value;
-  const comments   = commentsEl ? commentsEl.value.trim() : '';
-  const sigData    = window.getSigData ? window.getSigData() : '';
+  return {
+    name:     document.getElementById('director-name').value.trim(),
+    date:     document.getElementById('conf-date').value,
+    comments: commentsEl ? commentsEl.value.trim() : '',
+    sigData:  window.getSigData ? window.getSigData() : '',
+  };
+}
+
+/* Shared validation — highlights fields and returns true when all is well. */
+function validateForm() {
+  const nameEl = document.getElementById('director-name');
+  const dateEl = document.getElementById('conf-date');
+  const sigBox = document.querySelector('.sig-container');
+  const data   = collectForm();
 
   nameEl.classList.remove('field-error');
   dateEl.classList.remove('field-error');
   if (sigBox) sigBox.classList.remove('sig-error');
 
   const errors = [];
-  if (!name) { errors.push('Name of Independent Expert / Technical Arbiter is required.'); nameEl.classList.add('field-error'); nameEl.focus(); }
-  if (!sigData) { errors.push('Signature is required.'); if (sigBox) sigBox.classList.add('sig-error'); }
-  if (!date) { errors.push('Date is required.'); dateEl.classList.add('field-error'); }
+  if (!data.name) { errors.push('Name of Independent Expert / Technical Arbiter is required.'); nameEl.classList.add('field-error'); nameEl.focus(); }
+  if (!data.sigData) { errors.push('Signature is required.'); if (sigBox) sigBox.classList.add('sig-error'); }
+  if (!data.date) { errors.push('Date is required.'); dateEl.classList.add('field-error'); }
 
-  if (errors.length) { showToast(errors[0], true); return; }
+  if (errors.length) { showToast(errors[0], true); return false; }
+  return true;
+}
 
-  const saveBtn = document.getElementById('btn-save');
-  saveBtn.disabled = true;
-  saveBtn.textContent = 'Saving…';
+/* Turn a live answer cell into static preview text. */
+function renderAnswerPreview(cell) {
+  const checkbox = cell.querySelector('.checkbox');
+  if (checkbox) {
+    return checkbox.checked
+      ? '<span class="pv-answer pv-yes">&#10003; Done</span>'
+      : '<span class="pv-answer pv-empty">Not ticked</span>';
+  }
+
+  const radio = cell.querySelector('.radio-ans:checked');
+  if (cell.querySelector('.radio-ans')) {
+    if (!radio) return '<span class="pv-answer pv-empty">No answer</span>';
+    const label = radio.parentElement.textContent.trim();
+    const cls   = (radio.value === 'yes' || radio.value === 'true') ? 'pv-yes' : 'pv-no';
+    return '<span class="pv-answer ' + cls + '">' + label + '</span>';
+  }
+
+  const text = cell.querySelector('.ans-text');
+  if (text) {
+    const v = text.value.trim();
+    return v
+      ? '<span class="pv-answer">' + escapeHtml(v) + '</span>'
+      : '<span class="pv-answer pv-empty">No response</span>';
+  }
+  return '<span class="pv-answer pv-empty">—</span>';
+}
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+/* Build the read-only preview from the live form. */
+function buildPreview() {
+  const body = document.getElementById('preview-body');
+  const data = collectForm();
+  body.innerHTML = '';
+
+  document.querySelectorAll('[data-section]').forEach(section => {
+    const title = section.querySelector('h2');
+    const table = section.querySelector('table');
+    if (!table) return;
+
+    const h3 = document.createElement('h3');
+    h3.textContent = title ? title.textContent.trim() : '';
+    body.appendChild(h3);
+
+    const clone = table.cloneNode(true);
+    const liveRows  = table.querySelectorAll('tbody tr');
+    const cloneRows = clone.querySelectorAll('tbody tr');
+    cloneRows.forEach((row, i) => {
+      const target = row.cells[row.cells.length - 1];
+      const source = liveRows[i].cells[liveRows[i].cells.length - 1];
+      target.innerHTML = renderAnswerPreview(source);
+      target.style.textAlign = 'center';
+    });
+    body.appendChild(clone);
+  });
+
+  if (data.comments) {
+    const h3 = document.createElement('h3');
+    h3.textContent = 'Other Comments';
+    body.appendChild(h3);
+    const p = document.createElement('p');
+    p.style.cssText = 'font-size:15px;border:1px solid #ddd;border-radius:4px;padding:8px 10px;background:#fafafa;';
+    p.textContent = data.comments;
+    body.appendChild(p);
+  }
+
+  const h3 = document.createElement('h3');
+  h3.textContent = 'Confirmation and Signature';
+  body.appendChild(h3);
+
+  const block = document.createElement('div');
+  block.innerHTML =
+    '<div class="pv-field"><span class="pv-label">NAME OF INDEPENDENT EXPERT / TECHNICAL ARBITER:</span>' +
+      '<span class="pv-value">' + escapeHtml(data.name) + '</span></div>' +
+    '<div class="pv-field"><span class="pv-label">SIGNATURE:</span>' +
+      '<span class="pv-value" style="border:none">' +
+        (data.sigData ? '<img src="' + data.sigData + '" alt="Signature" class="pv-sig">'
+                      : '<span class="pv-answer pv-empty">No signature</span>') +
+      '</span></div>' +
+    '<div class="pv-field"><span class="pv-label">DATE:</span>' +
+      '<span class="pv-value">' + escapeHtml(data.date) + '</span></div>';
+  body.appendChild(block);
+}
+
+function openPreview() {
+  if (!validateForm()) return;
+  buildPreview();
+  const modal = document.getElementById('preview-modal');
+  modal.classList.add('open');
+  document.getElementById('preview-body').scrollTop = 0;
+}
+
+function closePreview() {
+  document.getElementById('preview-modal').classList.remove('open');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closePreview();
+});
+
+/* ── Save confirmation ── */
+function saveConfirmation() {
+  if (!validateForm()) { closePreview(); return; }
+
+  const nameEl  = document.getElementById('director-name');
+  const data    = collectForm();
+  const confirm = document.getElementById('btn-confirm-submit');
+
+  const reset = () => { confirm.disabled = false; confirm.textContent = 'Confirm & Submit'; };
+
+  confirm.disabled = true;
+  confirm.textContent = 'Submitting…';
 
   postJSON('/api/save-confirmation/', {
-    director_name: name, signature_date: date,
-    signature_data: sigData, other_comments: comments,
+    director_name: data.name, signature_date: data.date,
+    signature_data: data.sigData, other_comments: data.comments,
   })
     .then(d => {
       if (d.success) {
+        closePreview();
         showThankYou();
       } else if (d.error === 'name_exists') {
         showToast('A confirmation under this name is already permanently recorded.', true);
-        saveBtn.disabled = false; saveBtn.textContent = 'Save Confirmation';
+        reset();
       } else if (d.error === 'name_required') {
         showToast('Please enter the name of the Independent Expert / Technical Arbiter.', true);
         nameEl.classList.add('field-error'); nameEl.focus();
-        saveBtn.disabled = false; saveBtn.textContent = 'Save Confirmation';
+        closePreview(); reset();
       } else {
         showToast('Error: ' + (d.error || '?'), true);
-        saveBtn.disabled = false; saveBtn.textContent = 'Save Confirmation';
+        reset();
       }
     })
-    .catch(() => {
-      showToast('Network error.', true);
-      saveBtn.disabled = false; saveBtn.textContent = 'Save Confirmation';
-    });
+    .catch(() => { showToast('Network error.', true); reset(); });
 }
 </script>
 </body>

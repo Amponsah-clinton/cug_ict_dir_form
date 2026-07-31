@@ -84,52 +84,11 @@ SECTIONS = [
             },
         ],
     },
-    {
-        'title': 'Testing and Validation Checklist',
-        'section_key': 's2_testing',
-        'response_label': 'Status',
-        'columns': [
-            {'key': 'module', 'label': 'Test Phase'},
-            {'key': 'correction', 'label': 'Activity'},
-        ],
-        'items': [
-            {'id': 'tv_01', 'num': 1, 'module': 'Phase 1', 'correction': 'Internal unit testing of each individual fix', 'action': ''},
-            {'id': 'tv_02', 'num': 2, 'module': 'Phase 2', 'correction': 'Integrated system testing across all workflows', 'action': ''},
-            {'id': 'tv_03', 'num': 3, 'module': 'Phase 3', 'correction': 'User Acceptance Testing (UAT) with department heads and key stakeholders', 'action': ''},
-            {'id': 'tv_04', 'num': 4, 'module': 'Phase 4', 'correction': 'Final regression testing to ensure no new issues were introduced', 'action': ''},
-            {'id': 'tv_05', 'num': 5, 'module': 'Phase 5', 'correction': 'Security and access control testing', 'action': ''},
-            {'id': 'tv_06', 'num': 6, 'module': 'Phase 6', 'correction': 'Performance and load testing', 'action': ''},
-        ],
-    },
-    {
-        'title': 'Consultation Confirmation',
-        'section_key': 's3_consultation',
-        'response_label': 'Status',
-        'columns': [
-            {'key': 'correction', 'label': 'Consultation Activity'},
-        ],
-        'items': [
-            {'id': 'cc_01', 'num': 1, 'module': '', 'correction': 'Consulted Madam Millicent (current HR Manager) on form workflows and role assignments', 'action': ''},
-            {'id': 'cc_02', 'num': 2, 'module': '', 'correction': 'Consulted Madam Mercy (former HR Manager) on historical procedures and best practices', 'action': ''},
-            {'id': 'cc_03', 'num': 3, 'module': '', 'correction': 'Incorporated feedback from HR and administrative stakeholders into final system', 'action': ''},
-        ],
-    },
-    {
-        'title': 'Final Verification',
-        'section_key': 's4_final',
-        'response_label': 'Status',
-        'columns': [
-            {'key': 'correction', 'label': 'Item'},
-        ],
-        'items': [
-            {'id': 'fv_01', 'num': 1, 'module': '', 'correction': 'All fixes implemented as described above', 'action': ''},
-            {'id': 'fv_02', 'num': 2, 'module': '', 'correction': 'All testing phases successfully completed', 'action': ''},
-            {'id': 'fv_03', 'num': 3, 'module': '', 'correction': 'System ready for full rollout', 'action': ''},
-            {'id': 'fv_04', 'num': 4, 'module': '', 'correction': 'User manuals and training guides prepared', 'action': ''},
-            {'id': 'fv_05', 'num': 5, 'module': '', 'correction': 'On-site training support scheduled', 'action': ''},
-        ],
-    },
 ]
+
+# Sections that were retired from the report. Kept here (rather than simply
+# deleted) so Supabase-seeded copies of the same rows are filtered out too.
+REMOVED_SECTION_KEYS = {'s2_testing', 's3_consultation', 's4_final'}
 
 # Keyed by section_key so Supabase-sourced sections (which don't carry
 # column/response-label metadata in the DB row) can still render correctly.

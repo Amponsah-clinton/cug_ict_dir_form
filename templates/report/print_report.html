@@ -242,7 +242,11 @@
 <div class="print-bar">
   <div class="print-bar-left">
     <span>&#128196; Archival Corrections Report</span>
-    <a href="/admin/">← Back to Dashboard</a>
+    {% if is_public %}
+      <a href="/thanks/">← Back</a>
+    {% else %}
+      <a href="/admin/">← Back to Dashboard</a>
+    {% endif %}
   </div>
   <button class="btn-print" onclick="window.print()">&#128424; Save as PDF / Print</button>
 </div>
