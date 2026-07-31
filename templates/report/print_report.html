@@ -208,20 +208,6 @@
 
     .sig-none-text { color: #bbb; font-style: italic; font-size: 13px; }
 
-    /* ── Stamp ─────────────────────────────────────────── */
-    .stamp {
-      display: inline-block;
-      border: 2px solid #15803d;
-      border-radius: 4px;
-      color: #15803d;
-      padding: 4px 14px;
-      font-size: 13px;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-top: 10px;
-    }
-
     /* ── Print overrides ─────────────────────────────── */
     @media print {
       body { background: #fff; }
@@ -310,10 +296,6 @@
       <span class="field-label">DATE:</span>
       <div class="field-value">{{ confirmation.signature_date|default:"" }}</div>
     </div>
-
-    {% if confirmation.director_name or confirmation.signature_data %}
-    <div class="stamp">&#10003; Confirmed &amp; Signed</div>
-    {% endif %}
   </div>
 
   <div class="report-footer">{{ done_count }} of {{ total }} corrections completed &nbsp;·&nbsp; Submitted {{ submitted_at }} &nbsp;·&nbsp; Metascholar Consult Ltd</div>
