@@ -20,13 +20,13 @@ DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1')
 
 _allowed = os.getenv(
     'ALLOWED_HOSTS',
-    '127.0.0.1,localhost,cugregistration.academicdigital.space,geym16agqw1rlxtixqeqljxy.72.61.97.184.sslip.io',
+    '127.0.0.1,localhost,cugregistration.academicdigital.space,http://iuaco3z73gv49akl56okbbb9.72.61.97.184.sslip.io/',
 )
 ALLOWED_HOSTS = [h.strip() for h in _allowed.split(',') if h.strip()]
 
 _origins = os.getenv(
     'CSRF_TRUSTED_ORIGINS',
-    'http://127.0.0.1:8000,http://localhost:8000,https://cugregistration.academicdigital.space,http://geym16agqw1rlxtixqeqljxy.72.61.97.184.sslip.io',
+    'http://127.0.0.1:8000,http://localhost:8000,https://cugregistration.academicdigital.space,http://iuaco3z73gv49akl56okbbb9.72.61.97.184.sslip.io/',
 )
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in _origins.split(',') if o.strip()]
 
