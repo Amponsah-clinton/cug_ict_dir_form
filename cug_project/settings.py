@@ -18,11 +18,22 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-cug-archival-system-change
 
 DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1')
 
-_allowed = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost,geym16agqw1rlxtixqeqljxy.72.61.97.184.sslip.io')
+_allowed = os.getenv(
+    'ALLOWED_HOSTS',
+    '127.0.0.1,localhost,cugregistration.academicdigital.space,geym16agqw1rlxtixqeqljxy.72.61.97.184.sslip.io',
+)
 ALLOWED_HOSTS = [h.strip() for h in _allowed.split(',') if h.strip()]
 
-_origins = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://127.0.0.1:8000,http://localhost:8000,http://geym16agqw1rlxtixqeqljxy.72.61.97.184.sslip.io')
+_origins = os.getenv(
+    'CSRF_TRUSTED_ORIGINS',
+    'http://127.0.0.1:8000,http://localhost:8000,https://cugregistration.academicdigital.space,http://geym16agqw1rlxtixqeqljxy.72.61.97.184.sslip.io',
+)
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in _origins.split(',') if o.strip()]
+
+# Coolify/Cloudflare terminate TLS in front of the app and forward the
+# original scheme via this header — needed for request.is_secure() and
+# CSRF origin checks to work correctly behind the proxy.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -88,9 +99,9 @@ else:
 # ── Supabase Configuration ──────────────────────────────────────────────────
 # Same project as applab: xdouuloczyuaqplfmrve
 # Data stored: corrections (is_done state) + director_confirmation
-SUPABASE_URL = 'https://xdouuloczyuaqplfmrve.supabase.co'
-SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhkb3V1bG9jenl1YXFwbGZtcnZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxMTI4NDksImV4cCI6MjA4MTY4ODg0OX0.ZNCn-4Kv8yhqafNz6o1YV8g8wrxy5E0-Ki15mrYDZiw'
-SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhkb3V1bG9jenl1YXFwbGZtcnZlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NjExMjg0OSwiZXhwIjoyMDgxNjg4ODQ5fQ.GqBmsygTS23PyIiofEIs3BT88tsgiQ3qRt-7mF38DXM'
+SUPABASE_URL = os.getenv('SUPABASE_URL', '')
+SUPABASE_KEY = os.getenv('SUPABASE_KEY', '')
+SUPABASE_SERVICE_KEY = os.getenv('SUPABASE_SERVICE_KEY', '')
 
 if not SUPABASE_URL or not SUPABASE_KEY or not SUPABASE_SERVICE_KEY:
     print("\n" + "=" * 80)
@@ -127,8 +138,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ── Email (Resend SMTP) ─────────────────────────────────────────────────────
-RESEND_API_KEY    = 're_8oKMDXqA_83UBMsJcVZXRqJKuwjyn3XbV'
-RESEND_FROM_EMAIL = 'support@academicdigital.space'
+RESEND_API_KEY    = os.getenv('RESEND_API_KEY', '')
+RESEND_FROM_EMAIL = os.getenv('RESEND_FROM_EMAIL', 'support@academicdigital.space')
 
 EMAIL_BACKEND       = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST          = 'smtp.resend.com'
